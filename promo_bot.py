@@ -11,7 +11,7 @@ api_id = '16620070'
 api_hash = 'dbf692cdc9b6fb2977dda29fb1691df4'
 group_ids = [-4129962829]
 sleep_time=2
-bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
+bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
 menu_system=[
     [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('〽️ Agregar Canal',resize=True),Button.text('🔎 Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]],
     [[Button.text('💼 Billetera',resize=True)],[Button.text('👁️ Remitente',resize=True),Button.text('⏳ Espera',resize=True)],[Button.text('🕖 Reenvío',resize=True),Button.text('✏️ Editar Grupos',resize=True)],[Button.text('🔰 Referidos',resize=True)],[Button.text('🔙 Back',resize=True),Button.text('🔝 Main Menu',resize=True)]]      
