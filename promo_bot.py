@@ -13,7 +13,7 @@ group_ids = {}
 channel_ids={}
 chat_ids=[-1002122725303]
 sleep_time={}
-bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
+bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
 user_dates={}
 menu_system=[
     [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('〽️ Agregar Canal',resize=True),Button.text('🔎 Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]],
