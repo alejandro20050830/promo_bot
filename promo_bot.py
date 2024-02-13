@@ -12,14 +12,14 @@ api_hash = 'dbf692cdc9b6fb2977dda29fb1691df4'
 group_ids = {}
 channel_ids={}
 chat_ids=[]
-sleep_time={}
+
 #bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
 bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
 user_dates={}
 menu_system=[
     [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('〽️ Agregar Canal',resize=True),Button.text('🔎 Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]],
-    [[Button.text('💼 Billetera',resize=True)],[Button.text('👁️ Remitente',resize=True),Button.text('⏳ Espera',resize=True)],[Button.text('🕖 Reenvío',resize=True),Button.text('✏️ Editar Grupos',resize=True)],[Button.text('🔰 Referidos',resize=True)],[Button.text('🔙 Back',resize=True),Button.text('🔝 Main Menu',resize=True)]]      
-             
+    [[Button.text('💼 Billetera',resize=True)],[Button.text('👁️ Remitente',resize=True),Button.text('⏳ Espera',resize=True)],[Button.text('🕖 Reenvío',resize=True),Button.text('✏️ Editar Grupos',resize=True)],[Button.text('🔰 Referidos',resize=True),Button.text('Siguiente ➡️',resize=True)],[Button.text('🔙 Back',resize=True),Button.text('🔝 Main Menu',resize=True)]],      
+    [[Button.text('🧩 Más Cuentas',resize=True)],[Button.text('〽️ Más Canales',resize=True)],[Button.text('🔙 Back',resize=True),Button.text('🔝 Main Menu',resize=True)]]       
              ]
 menu_history={}
 # Iniciar sesión como bot
@@ -108,7 +108,8 @@ async def start(event):
         [Button.text('First button')],
         [Button.text('Second button')]
     ])
-    await event.respond("'🐾 ¡Conexión Establecida con Éxito!\n\n🤜🤛 Gracias por elegir @Camariobot, ahora todos nuestros servicios están disponibles para usted!\n\n👣 Para comenzar a configurar su primera tarea de reenvío siga los siguientes pasos:\n \n#Paso1 - Debes agregar un canal el cual se utilizará para reenviar todas la publiciones a todos sus grupos agregados.\n\n• <b>/AgregarCanal</b><b>\n\n</b>#Paso2 - Es tan simple que solamente te falta agregar las ID de los grupos a los cuales se reenviarán los mensajes recibidos en el canal previamente configurado.\n\n• <b>/AgregarGrupos</b><b>\n\n</b>⚙️ Para cualquier consulta, no dude en contactar con @CamarioAdmin\n\n🦎 Manténgase Informado con las últimas actualizaciones @Camario'", buttons=keyboard,parse_mode='html')
+    await event.respond('Bienvenido', buttons=keyboard,parse_mode='html')
+    await event.respond('• Manténgase Actualizado:', buttons=[(Button.url('🦎 Camario', 'http://t.me/Camario'))],parse_mode='html')
 
 
 @bot.on(events.NewMessage(pattern='/connect'))
@@ -232,16 +233,73 @@ async def add_channel(event):
             
         await event.respond(msg)
      
-   
+@bot.on(events.NewMessage(pattern='/time'))
+async def time(event):
+    sender = await event.get_sender()
+    chat = await event.get_chat()
+    message = event.raw_text
+    comand=message.split(' ')
+    global user_dates
+    if len(comand)==2:
+        time=int(comand[1])
     
+        if sender.id not in user_dates:
+            
+            user_dates[sender.id]={}
+            
+            
+        user_dates[sender.id]['sleep_time']=time
+        
+            
+        await event.respond(f'Tiempo de reenvio modiificado a {time} seg entre cada menaje')
+        
+        
+@bot.on(events.NewMessage(pattern='/wait'))
+async def wait(event):
+    sender = await event.get_sender()
+    chat = await event.get_chat()
+    message = event.raw_text
+    comand=message.split(' ')
+    global user_dates
+    if len(comand)==2:
+        w_time=int(comand[1])
+    
+        if sender.id not in user_dates:
+            
+            user_dates[sender.id]={}
+            
+            
+        user_dates[sender.id]['wait_time']=w_time
+        
+            
+        await event.respond(f'Tiempo de retraso reenvio modiificado a {w_time} seg entre cada menaje')
+
+
+
+   
+
+
 
 @bot.on(events.NewMessage())
 async def handle_channels_new_message(event):
+    global user_dates
     chat_id = event.chat_id
     sender = await event.get_sender()
     print(sender.id)
         
     user_id=sender.id
+    if sender.id not in user_dates:
+            
+            user_dates[sender.id]={}
+    if 'sleep_time' not in user_dates[sender.id]:
+        user_dates[sender.id]['sleep_time']=1
+        
+    sleep_time= user_dates[sender.id]['sleep_time']
+    
+    if 'wait_time' not in user_dates[sender.id]:
+        user_dates[sender.id]['wait_time']=1
+        
+    wait_time= user_dates[sender.id]['wait_time']
    
     if chat_id in chat_ids:
         
@@ -263,13 +321,14 @@ async def handle_channels_new_message(event):
         if user_id not in group_ids:
             await event.respond('No tiene chats agregados') 
         else:
+            await asyncio.sleep(wait_time)
             
             for group_id in group_ids[user_id]:
                 
                 try:
                     
                     await user.send_message(int(group_id), msg)
-                    #await asyncio.sleep(sleep_time)
+                    await asyncio.sleep(sleep_time)
                 except Exception as e:
                     print(e)
                 
@@ -283,11 +342,20 @@ async def handle_channels_new_message(event):
 
 @bot.on(events.NewMessage(pattern='/send_anounce'))
 async def send_anounce(event):
+    global user_dates
+    
+   
     sender = await event.get_sender()
     user = TelegramClient(str(sender.id), api_id, api_hash)
     await user.connect()
     chat = await event.get_chat()
-    
+    if sender.id not in user_dates:
+            
+            user_dates[sender.id]={}
+    if 'sleep_time' not in user_dates[sender.id]:
+        user_dates[sender.id]['sleep_time']=1
+        
+    sleep_time= user_dates[sender.id]['sleep_time']
     message = event.raw_text
     comand=message.split('->')
     if len(comand)==2:
@@ -342,7 +410,7 @@ async def handler(event):
         await event.respond('🆔 Agrege el ID de los grupos a los cuales se reenviarán las publicaciones.\n\n• Debes ser miembro de todos los grupos agregados.\n\n♻️ Parámetros de Conexión:\n\n/id (ID de sus grupos, separe con un espacio cada ID)\n\n• Ejemplo:\n\n/id 1001256118443 1001484740111\n\n🔍 Localice el ID de sus grupos utilizando @ScanIDBot.\n\n• ¿No estás seguro de cómo proceder?\n\n⚙️ Contacte con <b><a href="@CamarioAdmin">Soporte\n\n</a></b>🔎 Agregue grupos y comienze a crecer:',buttons=keyboard,parse_mode='html')
 
     if message=='⚙️ Configuración':
-        keyboard = [[Button.text('💼 Billetera',resize=True)],[Button.text('👁️ Remitente',resize=True),Button.text('⏳ Espera',resize=True)],[Button.text('🕖 Reenvío',resize=True),Button.text('✏️ Editar Grupos',resize=True)],[Button.text('🔰 Referidos',resize=True)],[Button.text('🔙 Back',resize=True),Button.text('🔝 Main Menu',resize=True)]]
+        keyboard = menu_system[1]
         await event.respond("⚙️ Configuración",buttons=keyboard,parse_mode='html')
         
     
@@ -380,6 +448,18 @@ async def handler(event):
     if message== '🔰 Referidos':
         keyboard = [Button.inline('♻️ Generar Enlace', data=b'referreals')]
         await event.respond('🔰 ¡Gane el 25% de los fondos aumentados por sus referidos!\n\n• <b>Referidos</b> - 0\n\n• <b>Comisiones</b> - 0 USD\n\n👛 Los Referidos existen para brindarle la oportunidad de adquirir suscripciónes de pago gratis!', buttons=keyboard,parse_mode='html')  
+    
+    if message=='Siguiente ➡️':
+        keyboard = menu_system[2]
+        await event.respond("Siguiente ➡️",buttons=keyboard,parse_mode='html')
+    
+    if message=='🧩 Más Cuentas':
+        keyboard = [Button.inline('🕖 Aumentar Tiempo', data=b'more_accounts')]
+        await event.respond('🧩 Para evitar pagar múltiples pagos, desde este menú podrás agregar hasta un máximo de 3 cuentas!\n\n• Una vez caducada la suscripción de está cuenta las cuentas agregadas también perderán todos los beneficios.',buttons=keyboard,parse_mode='html')   
+    
+    if message=='〽️ Más Canales':
+       
+        await event.respond('〽️ Más Canales',parse_mode='html')     
     
     if message== '🔙 Back':
         keyboard=await menu_action('back',event)
