@@ -3,7 +3,7 @@ from telethon.tl import functions, types
 from telethon import events, Button
 import telegram
 from keep_alive import keep_alive
-#keep_alive()
+keep_alive()
 
 import telethon
 import asyncio
