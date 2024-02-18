@@ -18,7 +18,7 @@ channel_ids_swap={}
 pending_messages = {}
 admins=[]
 bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
-#bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
+bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
 user_dates={}
 menu_system=[
     [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('💠 Conectar Canal',resize=True),Button.text('〽️ Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]],
@@ -692,15 +692,18 @@ async def callback_handler(event):
         await event.respond(f'https://t.me/Camariobot?start={sender.id}',buttons=keyboard,parse_mode='html')
         
     if event.data == b'auto_send_ref_link':
+        user_id=sender.id
         if user_id not in user_dates:
             
             user_dates[user_id]={}
-        if 'sleep_time' not in user_dates[sender.id]:
-            user_dates[sender.id]['sleep_time']=1
+        if 'resend_loop' not in user_dates[user_id]:
+            user_dates[user_id]['resend_loop']=0
+            
+
         
-        sleep_time= user_dates[sender.id]['sleep_time']
+        sleep_time=user_dates[user_id]['resend_loop']
         keyboard = [Button.inline('🧩 Continuar', data=b'yes_auto_send_ref_link'),Button.inline('🚫 Cancelar', data=b'can_auto_send_ref_link')]
-        await event.respond(f'🧩 Reenviaras tu enlace a todos los grupos con un intervalo de reenvío de {sleep_time} Segundos.\n\n• Está acción es gratis\n\n⁉️ Deseas continuar con el reenvío:',buttons=keyboard,parse_mode='html')
+        await event.respond(f'🧩 Reenviaras tu enlace a todos los grupos con un intervalo de reenvío de {str(sleep_time/60)} Minutos.\n\n• Está acción es gratis\n\n⁉️ Deseas continuar con el reenvío:',buttons=keyboard,parse_mode='html')
     if event.data == b'yes_auto_send_ref_link':
         keyboard = [Button.inline('🧩 Continuar', data=b'cont_auto_send_ref_link'),Button.inline('🚫 Cancelar', data=b'can_auto_send_ref_link')]
         user_id=sender.id
