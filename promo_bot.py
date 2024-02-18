@@ -14,13 +14,14 @@ api_hash = 'dbf692cdc9b6fb2977dda29fb1691df4'
 group_ids = {}
 channel_ids={}
 chat_ids=[]
+channel_ids_swap={}
 pending_messages = {}
-
+admins=[]
 bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
 #bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
 user_dates={}
 menu_system=[
-    [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('〽️ Agregar Canal',resize=True),Button.text('🔎 Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]],
+    [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('💠 Conectar Canal',resize=True),Button.text('〽️ Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]],
     [[Button.text('💼 Billetera',resize=True)],[Button.text('👁️ Remitente',resize=True),Button.text('⏳ Espera',resize=True)],[Button.text('🕖 Reenvío',resize=True),Button.text('✏️ Editar Grupos',resize=True)],[Button.text('🔰 Referidos',resize=True),Button.text('Siguiente ➡️',resize=True)],[Button.text('🔙 Back',resize=True),Button.text('🔝 Main Menu',resize=True)]],      
     [[Button.text('🧩 Más Cuentas',resize=True)],[Button.text('〽️ Más Canales',resize=True)],[Button.text('🔙 Back',resize=True),Button.text('🔝 Main Menu',resize=True)]]       
              ]
@@ -81,7 +82,7 @@ async def login_(event,password="not_set"):
             await user.disconnect()
             return 2
         
-    keyboard = [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('〽️ Agregar Canal',resize=True),Button.text('🔎 Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]]       
+    keyboard = [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('💠 Conectar Canal',resize=True),Button.text('〽️ Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]]       
     await event.respond("'🐾 ¡Conexión Establecida con Éxito!\n\n🤜🤛 Gracias por elegir @Camariobot, ahora todos nuestros servicios están disponibles para usted!\n\n👣 Para comenzar a configurar su primera tarea de reenvío siga los siguientes pasos:\n \n#Paso1 - Debes agregar un canal el cual se utilizará para reenviar todas la publiciones a todos sus grupos agregados.\n\n• <b>/AgregarCanal</b><b>\n\n</b>#Paso2 - Es tan simple que solamente te falta agregar las ID de los grupos a los cuales se reenviarán los mensajes recibidos en el canal previamente configurado.\n\n• <b>/AgregarGrupos</b><b>\n\n</b>⚙️ Para cualquier consulta, no dude en contactar con @CamarioAdmin\n\n🦎 Manténgase Informado con las últimas actualizaciones @Camario'", buttons=keyboard,parse_mode='html')
     await user.disconnect()
     return 0
@@ -92,6 +93,7 @@ async def login_(event,password="not_set"):
 #Comands
 @bot.on(events.NewMessage(pattern='/start'))
 async def start(event):
+    global user_dates
     # Crear un "InlineKeyboardButton" para el "Online Button"
     online_button = types.KeyboardButtonCallback(text='Online', data=b'online')
 
@@ -101,7 +103,7 @@ async def start(event):
 
 # Crear un teclado con los botones
     #keyboard = types.ReplyKeyboardMarkup([Button.text('Mi Botón')], resize=True,persistent=True)
-    keyboard = [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('〽️ Agregar Canal',resize=True),Button.text('🔎 Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]]
+    keyboard = [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('💠 Conectar Canal',resize=True),Button.text('〽️ Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]]
     chat = await event.get_chat()
     sender = await event.get_sender()
     message = event.raw_text
@@ -113,7 +115,12 @@ async def start(event):
         [Button.text('First button')],
         [Button.text('Second button')]
     ])
-    await event.respond('Bienvenido', buttons=keyboard,parse_mode='html')
+    if sender.id not in user_dates:
+        await event.respond('🤜🤛 Gracias por elegir @Camariobot!\n\n👣 Para comenzar a configurar su cuenta siga los siguientes pasos:\n\n#Paso1 - El primero de 3 simplemente pasos a seguir será conectar su cuenta de Telegram con nuestro bot!\n\n• /ConectarCuenta\n\n#Paso2 - Debes agregar un canal el cual se utilizará para reenviar todas la publicaciones a todos los grupos agregados!\n\n• /AgregarCanal\n\n#Paso3 - Es tan simple que solamente te falta agregar las ID de los grupos a los cuales se reenviarán los mensajes recibidos en el canal previamente configurado!\n\n• /AgregarGrupos', buttons=keyboard,parse_mode='html')
+    else :  
+        await event.respond('Bienvenido', buttons=keyboard,parse_mode='html')
+        
+        
     await event.respond('• Manténgase Actualizado:', buttons=[(Button.url('🦎 Camario', 'http://t.me/Camario'))],parse_mode='html')
 
 
@@ -131,7 +138,15 @@ async def send_code(event):
     message = event.raw_text
     comand=message.split(' ')
     if len(message.split(' '))==2:
+        
         phone=comand[1]
+        try:
+            numero = int(phone)  # Intentar convertir a entero
+        except ValueError:
+            
+            await event.respond('🚫 <b>Formato incorrecto</b>!\n\n☑️ Por favor envié su número de teléfono en el formato correcto!\n\n• Su número fuera +84 555555 tendría que enviar:\n\n/connect 84555555',parse_mode='html')
+            return 'not_number'
+ 
         phone_code_hash_=await user.send_code_request(phone)
         if sender.id not in user_dates:
             
@@ -143,7 +158,7 @@ async def send_code(event):
        
         await event.respond('📨 Ingrese el código de inicio de sesión enviado a la aplicación Telegram o SMS (<b>Sin espacios</b>)\n\n• <b>Ejemplo</b>:\n\nSu código de inicio de sesión es <b>123456</b>, luego ingrese <b>mycode123456</b>\n\n🧩 Por favor, introduzca el código resivido:',parse_mode='html')
     else:
-         await event.respond('🚫 <b>Formato incorrecto</b>!\n\n☑️ Por favor envié su número de teléfono en el formato correcto!\n\n• Su número fuera +84 555555 tendría que enviar:\n\n/connect 84555555',parse_mode='html')
+        await event.respond('🚫 <b>Formato incorrecto</b>!\n\n☑️ Por favor envié su número de teléfono en el formato correcto!\n\n• Su número fuera +84 555555 tendría que enviar:\n\n/connect 84555555',parse_mode='html')
         
     
     await user.disconnect()
@@ -152,6 +167,7 @@ async def send_code(event):
 async def get_groups(event):
     # Solicitar número de teléfono
     global user_dates
+    
     sender = await event.get_sender()
     
     user = TelegramClient(str(sender.id), api_id, api_hash)
@@ -168,8 +184,12 @@ async def get_groups(event):
             info+=str(chat.id)+" "+chat.title+'\n'
             print(f'ID del grupo: {chat.id}, Nombre del grupo: {chat.title}')
             
-    await event.respond(info,parse_mode='html')
-    
+    keyboard = [Button.inline('🗑️ Eliminar Mensaje', data=b'del_groups_msg')]    
+    msg_send=await event.respond(info,buttons=keyboard,parse_mode='html')
+    msg_id=msg_send.id
+    if sender.id not in user_dates:
+        user_dates[sender.id]={}
+    user_dates[sender.id]['groups_msg_id']=msg_id
     message = event.raw_text
     
       
@@ -257,7 +277,21 @@ async def add_channel(event):
             if sender.id not in channel_ids:
                 channel_ids[sender.id]=[]
             
-            channel_ids[sender.id].append(int(id_channel))
+            if sender.id not in admins:
+                if len(channel_ids[sender.id])>0:
+                    chanel_entity = await bot.get_entity(int(channel_ids[sender.id][0]))
+                    if sender.id not in channel_ids_swap:
+                        channel_ids_swap[sender.id]=[]
+                    channel_ids_swap[sender.id][0]=int(id_channel)
+                    
+                    keyboard = [Button.inline('〽️ Si', data=b'yes_swap_channel'),Button.inline('🚫 No', data=b'no_swap_channel')]
+                    await event.respond(f'〽️ Usted ya configuro un canal de reenvío anteriormente!\n\n• <b>Su canal</b> - (ID del canal, con un enlace al canal de usuario, por ejemplo <a href="https://t.me/{chanel_entity.username}">{channel_ids[sender.id][0]}</a>)\n\n⁉️ Deseas eliminar esté canal y configurar otro:',buttons=keyboard,parse_mode='html')
+                    return 'not admin'
+                else:
+                    channel_ids[sender.id].append(int(id_channel))
+                    
+            else:
+                channel_ids[sender.id].append(int(id_channel))
             
 
             
@@ -427,7 +461,7 @@ async def handle_channels_new_message(event):
         if user_id not in group_ids:
             await event.respond('No tiene chats agregados') 
         else:
-            await asyncio.sleep(wait_time)
+            
             timestamp=time.time()
             #date_in={timestamp:msg,'event':event.message}
             date_in={'time':timestamp,'msg':msg,'event':event.message}
@@ -462,7 +496,7 @@ async def handler(event):
     user = TelegramClient(str(sender.id), api_id, api_hash)
     await user.connect()
     
-    if message=='🧩 Conectar Cuenta':
+    if message=='🧩 Conectar Cuenta' or message=='/ConectarCuenta':
 
         if sender.id not in menu_history:
             menu_history[sender.id]=[message]
@@ -477,21 +511,21 @@ async def handler(event):
             
         else:
             keyboard = [Button.inline('🧩 Conectar Cuenta', data=b'connect')]
-            await event.respond("'🔘 Menú de Conectividad:\n\n• Utilice esto para forjar una conexión entre su cuenta y @CamarioBot.\n\n☑️ Una conexión con al menos una cuenta es esencial para utilizar los servicios.\n\n• Ingrese el número de teléfono asociado a la cuenta de Telegram, incluido el código de país.\n\n♻️ Parámetros de Conexión:\n\n<b>/connect</b> (Número de Teléfono)\n\n• <b>Ejemplo</b>:\n\n<b>/connect</b> +84 5555555\n\n🌐 Descubre el prefijo de cada país visitando este <b><a href='https://countrycode.org/'>Enlace</a></b>\n\n• ¿No estás seguro de cómo proceder?\n\n⚙️ Contacte con <b><a href='http://t.me/CamarioAdmin'>Soporte</a></b>\n\n🧩 Conecte su cuenta y comience a disfrutar:'", buttons=keyboard,parse_mode='html',link_preview=False)
+            await event.respond('🧩 Menú de Conectividad:\n\n• Utilice esto para forjar una conexión entre su cuenta y @CamarioBot.\n\n☑️ Una conexión con al menos una cuenta es esencial para utilizar los servicios.\n\n• Ingrese el número de teléfono asociado a la cuenta de Telegram, excluya el signo + del mensaje.\n\n♻️ Parámetros de Conexión:\n\n<code>/connect</code> (Número de teléfono sin el signo +)\n\n• <b>Ejemplo</b>:\n\n/connect 84 5555555\n\n🌐 Descubre el prefijo de cada país visitando este <a href="https://countrycode.org/">Enlace</a>\n\n• ¿No estás seguro de cómo proceder?\n\n⚙️ Contacte con <a href="http://t.me/CamarioAdmin">Soporte</a>\n\n🧩 Conecte su Cuenta:', buttons=keyboard,parse_mode='html',link_preview=False)
 
     if message=='🚫 Cancel':
         keyboard = await menu_action('cancel',event)
         await event.respond("🚫 Cancel",buttons=keyboard)
     
-    if message=='〽️ Agregar Canal':
+    if message=='💠 Conectar Canal' or message=='/AgregarCanal':
         keyboard = [Button.inline('〽️ Conectar Canal',data=b'add_channel')]
        
-        await event.respond('〽️ Menú de Conectividad:\n\n• Utilice esto para forjar una conexión entre su canal y @CamarioBot.\n\n☑️ Una conexión con un canal es esencial para utilizar los servicios de reenvío automático.\n\n• Debes ser miembro del canal agregado, actualmente solamente se permite agregar un canal de reenvío.\n\n♻️ Parámetros de Conexión:\n\n/channel (ID del canal utilizado como sede de reenvío)\n\n• <b>Ejemplo</b>:\n\n/channel 1002065562952\n\n🔍 Localice el ID de su canal utilizando @ScanIDBot.\n\n• ¿No estás seguro de cómo proceder?\n\n⚙️ Contacte con <a href="http://t.me/CamarioAdmin">Soporte</a>\n\n〽️ Conecte su Canal:',buttons=keyboard,parse_mode='html',link_preview=False)
+        await event.respond('💠 <b>Utilice esto para forjar una conexión entre su canal y </b><b>@CamarioBot</b>.\n\n• Una conexión con al menos un canal es esencial para utilizar los servicios de reenvío automático.\n\n🤖 <b>@Camariobot</b><b> deberá ser añadido como administrador en el canal configurado</b>!\n\n• Si no añade @Camariobot los servicios no funcionarán con normalidad.\n\n💡 <b>Parámetros de Conexión</b>:\n\n<code>/channel</code> (ID del Canal)\n\n• Ejemplo:\n\n/channel 1002065562952\n\n🔍 <b>Localice el ID de su canal utilizando </b><b>@ScanIDBot</b>.\n\n• ¿No estás seguro de cómo proceder? ¡Contacte con <b><a href="http://t.me/CamarioAdmin">Soporte</a></b>!\n\n💠 <b>Conecte</b> <b>un Canal</b>:',buttons=keyboard,parse_mode='html',link_preview=False)
         
-    if message=='🔎 Agregar Grupos':  
-        keyboard = [[Button.inline('🔎 Agregar Grupos',data=b'add_group')]]
+    if message=='〽️ Agregar Grupos' or message=='/AgregarGrupos':  
+        keyboard = [[Button.inline('〽️ Agregar Grupos',data=b'add_group')]]
         
-        await event.respond('🆔 Agrege el ID de los grupos a los cuales se reenviarán las publicaciones.\n\n• Debes ser miembro de todos los grupos agregados.\n\n♻️ Parámetros de Conexión:\n\n/id (ID de sus grupos, separe con un espacio cada ID)\n\n• Ejemplo:\n\n/id 1001256118443 1001484740111\n\n🔍 Localice el ID de sus grupos utilizando @ScanIDBot.\n\n• ¿No estás seguro de cómo proceder?\n\n⚙️ Contacte con <b><a href="@CamarioAdmin">Soporte\n\n</a></b>🔎 Agregue grupos y comienze a crecer:',buttons=keyboard,parse_mode='html')
+        await event.respond('〽️ ¡<b>Agrega el ID de los grupos a los cuales se reenviarán las publicaciones</b>!\n\n• Deberá ser miembro de todos los grupos agregados.\n\n• No existe un límite de grupos para reenviar publicaciones.\n\n• Para editar, eliminar o agregar nuevos grupos debera dirigirse ha "⚙️Configuración".\n\n💡 <b>Parámetros de Conexión</b>:\n\n/id (ID de los grupos, separe con un espacio cada ID)\n\n• <b>Ejemplo</b>:\n\n/id 1001256118443 1001484740111\n\n• ¿No estás seguro de cómo proceder? ¡Contacte con <b><a href="http://t.me/CamarioAdmin">Soporte</a></b>!\n\n〽️ Agregue los Grupos:',buttons=keyboard,parse_mode='html',link_preview=False)
 
     if message=='⚙️ Configuración':
         keyboard = menu_system[1]
@@ -503,7 +537,7 @@ async def handler(event):
         await event.respond('💷 0.00 TRX\n\n💶 0.00 USDT', buttons=keyboard,parse_mode='html')
     
     if message=='👁️ Remitente':
-        keyboard = [Button.inline('🟢 On', data=b'on'),Button.inline('🌑 Off', data=b'off')]
+        keyboard = [Button.inline('🟢 On', data=b'on_remitent'),Button.inline('🌑 Off_remitent', data=b'off_remitent')]
         await event.respond('📬 ¿Deseas mostrar el remitente en tus mensajes?\n\n• <b>Nota</b>:\n\nSi posees una suscripción premium y mantienes el remitente oculto tus mensajes no mostrarán emojis animados.\n\n🔘 Actualmente - On', buttons=keyboard,parse_mode='html')
 
 
@@ -603,7 +637,7 @@ async def menu_action(action,event):
         
 #Manejador de callbacks     
 @bot.on(events.CallbackQuery)
-async def connect(event):
+async def callback_handler(event):
     global user_dates
     chat_id = event.chat_id
     sender = await event.get_sender()
@@ -624,20 +658,74 @@ async def connect(event):
     
     if event.data == b'add_group':
         keyboard = [Button.text('🚫 Cancel', resize=True)]
-        await event.respond('💡 No existe un límite de grupos para reenviar publicaciones, utilize un espacio para separar un ID de otro.\n\n📡 @ScanIDBot Encuéntra el ID de grupos!\n\n• <b>Ejemplo</b>:\n\n/id 1001256118443 1001484740111 1001368540342\n\n🔎 Ingrese el ID de los Grupos:',buttons=keyboard,parse_mode='html')
+        await event.respond('🔘 <b>Recibe en un mensaje el ID de todos sus grupos enviando el comando</b>:\n\n• /get_groups\n\n💡 <b>Utilize un espacio para separar un ID de otro</b>.\n\n• Ejemplo:\n\n/id 1001256118443 1001484740111 1001368540342\n\n🔎 <b>Ingrese el</b> ID <b>de los Grupos</b>:',buttons=keyboard,parse_mode='html')
+    if event.data == b'add_channel':
+        keyboard = [Button.text('🚫 Cancel', resize=True)]
+        await event.respond('💠 <b>Recuerde añadir a </b><b>@Camariobot</b><b> en el canal</b> <b>agregado</b>!\n\n💡 <b>Deberás ingresar el ID del canal luego del comando</b> <code>/chanel</code>\n\n• Ejemplo:\n\n/chanel 1001368540342\n\n🔎 <b>Ingrese el</b> ID <b>del Canal</b>:',buttons=keyboard,parse_mode='html')
     
     if event.data == b'more_accounts':
         keyboard = [Button.text('🚫 Cancel', resize=True)]
         await event.respond('🆔 Envié el ID de las cuentas que deseas agregar:\n\n• Utilice @ScanIDBot Para obtener el ID de sus cuentas!\n\n🧩 Solo puedes agregar un máximo de 3 cuentas!\n\n/add (ID de sus cuentas, separe con un espacio cada ID) \n\n• Ejemplo:\n\n/add 1878166234 1459865634 181862566234\n\n🚫 Tenga en cuenta que tendrás que conectar cada cuenta con @Camariobot!\n\n• Esté menú no facilita la conexión entre cuentas, simplemente compartirá su suscripción con otras cuentas.\n\n🔎 Envié el ID de las Cuentas:',buttons=keyboard,parse_mode='html')
     
     if event.data == b'generate_ref_link':
+        
         keyboard = [Button.inline('🧩 Reenvio automatico', data=b'auto_send_ref_link')]
         await event.respond(f'https://t.me/Camariobot?start={sender.id}',buttons=keyboard,parse_mode='html')
         
     if event.data == b'auto_send_ref_link':
-        keyboard = [Button.inline('🧩 Continuar', data=b'cont_auto_send_ref_link'),Button.inline('🚫 Cancelar', data=b'can_auto_send_ref_link')]
+        keyboard = [Button.inline('🧩 Continuar', data=b'yes_auto_send_ref_link'),Button.inline('🚫 Cancelar', data=b'can_auto_send_ref_link')]
         await event.respond('🧩 Reenviaras tu enlace a todos los grupos con un intervalo de reenvío de 0 Minutos.\n\n• Está acción es gratis\n\n⁉️ Deseas continuar con el reenvío:',buttons=keyboard,parse_mode='html')
+    if event.data == b'yes_auto_send_ref_link':
+        keyboard = [Button.inline('🧩 Continuar', data=b'cont_auto_send_ref_link'),Button.inline('🚫 Cancelar', data=b'can_auto_send_ref_link')]
+        user_id=sender.id
+        if user_id not in user_dates:
+            
+            user_dates[user_id]={}
+                    
+        if user_id not in pending_messages:
+            
+            pending_messages[user_id]=[]
+            
+        if user_id not in group_ids:
+            await event.respond('🔎 Necesitas agregar grupos para reenviar automáticamente su enlace a ellos!\n\n• /AgregarGrupos',parse_mode='html') 
+        else:
+            
+            timestamp=time.time()
+            #date_in={timestamp:msg,'event':event.message}
+            date_in={'time':timestamp,'msg':f'https://t.me/Camariobot?start={sender.id}','event':'not_remitent'}
+            pending_messages[user_id].append(date_in)
+            
         
+                
+                
+        
+          
+    if event.data == b'yes_swap_channel':
+        
+        channel_ids[sender.id][0]=channel_ids_swap[sender.id][0]
+        await event.respond('〽️ Si\nNuevo canal configurado',parse_mode='html')
+        
+    if event.data == b'no_swap_channel':
+        keyboard = [Button.inline('🧩 Continuar', data=b'cont_auto_send_ref_link'),Button.inline('🚫 Cancelar', data=b'can_auto_send_ref_link')]
+        await event.respond('🚫 No\nNo se ha realizado ningun cambio',parse_mode='html')
+    
+    if event.data == b'del_groups_msg':
+        await bot.delete_messages(sender.id, [user_dates[sender.id]['groups_msg_id']])
+        
+    if event.data == b'on_remitent':
+        if sender.id not in user_dates:     
+            user_dates[sender.id]={}
+            
+        user_dates[sender.id]['remitent']=True
+        
+        await event.respond('Se ha activado el remitente',parse_mode='html')
+    if event.data == b'off_remitent':
+        if sender.id not in user_dates:     
+            user_dates[sender.id]={}
+            
+        user_dates[sender.id]['remitent']=False
+        
+        await event.respond('Se ha desactivado el remitente',parse_mode='html')
     
    
 #@bot.on(events.CallbackQuery)
@@ -654,77 +742,90 @@ async def connect(event):
  
  
 async def schedule_messages():
-    global user_dates
-    
-    bot_ = await TelegramClient('bot_', api_id, api_hash).start(bot_token=bot_token)
-    while True:
-        #print('.')
-        if len(pending_messages)>0:
-            for id_us in pending_messages:
-                if 'sleep_time' not in user_dates[id_us]:
-                    user_dates[id_us]['sleep_time']=1
+    try:
+        global user_dates
         
-                sleep_time= user_dates[id_us]['sleep_time']
-    
-                if 'wait_time' not in user_dates[id_us]:
-                    user_dates[id_us]['wait_time']=1
+        bot_ = await TelegramClient('bot_', api_id, api_hash).start(bot_token=bot_token)
+        while True:
+            #print('.')
+            if len(pending_messages)>0:
+                for id_us in pending_messages:
+                    
+                    if id_us not in user_dates:     
+                        user_dates[id_us]={}
+                    if 'remitent' not in user_dates[id_us]:
+                        user_dates[id_us]['remitent']=True
+                    if 'sleep_time' not in user_dates[id_us]:
+                        user_dates[id_us]['sleep_time']=1
+            
+                    sleep_time= user_dates[id_us]['sleep_time']
         
-                wait_time= user_dates[id_us]['wait_time'] 
-                if 'resend_loop' not in user_dates[id_us]:
-                    user_dates[id_us]['resend_loop']=0
-        
-                resend_loop= user_dates[id_us]['resend_loop'] 
-                user = TelegramClient(str(id_us), api_id, api_hash)
-                
-                await user.connect()
-                
+                    if 'wait_time' not in user_dates[id_us]:
+                        user_dates[id_us]['wait_time']=1
+            
+                    wait_time= user_dates[id_us]['wait_time'] 
+                    if 'resend_loop' not in user_dates[id_us]:
+                        user_dates[id_us]['resend_loop']=0
+            
+                    resend_loop= user_dates[id_us]['resend_loop'] 
+                    user = TelegramClient(str(id_us), api_id, api_hash)
+                    
+                    await user.connect()
+                    
 
-                msg_dates=pending_messages[id_us]
-                index=0
-                desv=0 
-                for msg_date in msg_dates:
-                                
-                                programed_time=msg_date['time']
-                        #for programed_time in msg_date:
-                         #   if programed_time!='event':
-                                event_message=msg_date['event']
-                                msg=msg_date['msg']
+                    msg_dates=pending_messages[id_us]
+                    index=0
+                    desv=0 
+                    for msg_date in msg_dates:
+                                    
+                                    programed_time=msg_date['time']
+                            #for programed_time in msg_date:
+                            #   if programed_time!='event':
+                                    event_message=msg_date['event']
+                                    msg=msg_date['msg']
 
-                                actual_time = time.time()
-                                
+                                    actual_time = time.time()
+                                    
 
-                                if float(actual_time)>=float(programed_time):
-                                    await asyncio.sleep(wait_time)
-                                    for group_id in group_ids[int(id_us)]:
-                                        
-                                        try:
-                                            await user.forward_messages(int(group_id),event_message)
+                                    if float(actual_time)>=float(programed_time):
+                                        await asyncio.sleep(wait_time)
+                                        for group_id in group_ids[int(id_us)]:
+                                            print(group_id)
+                                            try:
+                                                if user_dates[id_us]['remitent'] and event_message!='not_remitent':
+                                                    
+                                                    await user.forward_messages(int(group_id),event_message)
+                                                else:
+                                                    await user.send_message(int(group_id), msg,parse_mode='html')
+                                                print('send')
+                                                
+                                                await asyncio.sleep(sleep_time)
+                                            except Exception as e:
+                                                print(e)
                                             
-                                            #await user.send_message(int(group_id), msg)
-                                            await asyncio.sleep(sleep_time)
-                                        except Exception as e:
-                                            print(e)
-                                        
-                            
-                                    await bot_.send_message(int(id_us), "Mensaje reenviado")
                                 
-                                    if  resend_loop==0:
-                                        msg_dates.pop(index-desv)
-                                        desv+=1
-                                    else:
-                                        print('loop_resend')
-                                        msg_date['time']=programed_time+resend_loop
+                                        await bot_.send_message(int(id_us), "Mensaje reenviado")
+                                    
+                                        if  resend_loop==0:
+                                            msg_dates.pop(index-desv)
+                                            desv+=1
+                                        else:
+                                            print('loop_resend')
+                                            msg_date['time']=programed_time+resend_loop
+                                        
+                                
+                                
+                                    index+=1
+                                    
+                                    
+                                    
+                    
                                     
                             
-                            
-                                index+=1
-                                
-                                
-                                
-                
-                                
-                           
-                await user.disconnect()        
+                    await user.disconnect()       
+    except Exception as e:
+        print(e)
+        schedule_messages()
     
  
 def main():
