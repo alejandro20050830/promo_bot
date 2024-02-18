@@ -116,6 +116,9 @@ async def start(event):
         [Button.text('Second button')]
     ])
     if sender.id not in user_dates:
+        
+            
+        user_dates[sender.id]={}
         await event.respond('🤜🤛 Gracias por elegir @Camariobot!\n\n👣 Para comenzar a configurar su cuenta siga los siguientes pasos:\n\n#Paso1 - El primero de 3 simplemente pasos a seguir será conectar su cuenta de Telegram con nuestro bot!\n\n• /ConectarCuenta\n\n#Paso2 - Debes agregar un canal el cual se utilizará para reenviar todas la publicaciones a todos los grupos agregados!\n\n• /AgregarCanal\n\n#Paso3 - Es tan simple que solamente te falta agregar las ID de los grupos a los cuales se reenviarán los mensajes recibidos en el canal previamente configurado!\n\n• /AgregarGrupos', buttons=keyboard,parse_mode='html')
     else :  
         await event.respond('Bienvenido', buttons=keyboard,parse_mode='html')
@@ -668,16 +671,25 @@ async def callback_handler(event):
         await event.respond('🆔 Envié el ID de las cuentas que deseas agregar:\n\n• Utilice @ScanIDBot Para obtener el ID de sus cuentas!\n\n🧩 Solo puedes agregar un máximo de 3 cuentas!\n\n/add (ID de sus cuentas, separe con un espacio cada ID) \n\n• Ejemplo:\n\n/add 1878166234 1459865634 181862566234\n\n🚫 Tenga en cuenta que tendrás que conectar cada cuenta con @Camariobot!\n\n• Esté menú no facilita la conexión entre cuentas, simplemente compartirá su suscripción con otras cuentas.\n\n🔎 Envié el ID de las Cuentas:',buttons=keyboard,parse_mode='html')
     
     if event.data == b'generate_ref_link':
+
         
         keyboard = [Button.inline('🧩 Reenvio automatico', data=b'auto_send_ref_link')]
         await event.respond(f'https://t.me/Camariobot?start={sender.id}',buttons=keyboard,parse_mode='html')
         
     if event.data == b'auto_send_ref_link':
+        if user_id not in user_dates:
+            
+            user_dates[user_id]={}
+        if 'sleep_time' not in user_dates[sender.id]:
+            user_dates[sender.id]['sleep_time']=1
+        
+        sleep_time= user_dates[sender.id]['sleep_time']
         keyboard = [Button.inline('🧩 Continuar', data=b'yes_auto_send_ref_link'),Button.inline('🚫 Cancelar', data=b'can_auto_send_ref_link')]
-        await event.respond('🧩 Reenviaras tu enlace a todos los grupos con un intervalo de reenvío de 0 Minutos.\n\n• Está acción es gratis\n\n⁉️ Deseas continuar con el reenvío:',buttons=keyboard,parse_mode='html')
+        await event.respond(f'🧩 Reenviaras tu enlace a todos los grupos con un intervalo de reenvío de {sleep_time} Segundos.\n\n• Está acción es gratis\n\n⁉️ Deseas continuar con el reenvío:',buttons=keyboard,parse_mode='html')
     if event.data == b'yes_auto_send_ref_link':
         keyboard = [Button.inline('🧩 Continuar', data=b'cont_auto_send_ref_link'),Button.inline('🚫 Cancelar', data=b'can_auto_send_ref_link')]
         user_id=sender.id
+
         if user_id not in user_dates:
             
             user_dates[user_id]={}
@@ -685,6 +697,8 @@ async def callback_handler(event):
         if user_id not in pending_messages:
             
             pending_messages[user_id]=[]
+            
+
             
         if user_id not in group_ids:
             await event.respond('🔎 Necesitas agregar grupos para reenviar automáticamente su enlace a ellos!\n\n• /AgregarGrupos',parse_mode='html') 
@@ -825,7 +839,7 @@ async def schedule_messages():
                     await user.disconnect()       
     except Exception as e:
         print(e)
-        schedule_messages()
+        
     
  
 def main():
