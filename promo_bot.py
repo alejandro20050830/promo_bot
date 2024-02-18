@@ -18,7 +18,7 @@ channel_ids_swap={}
 pending_messages = {}
 admins=[]
 bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
-#bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
+bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
 user_dates={}
 menu_system=[
     [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('💠 Conectar Canal',resize=True),Button.text('〽️ Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]],
@@ -774,91 +774,91 @@ async def callback_handler(event):
  
  
 async def schedule_messages():
-    try:
-        global user_dates
         
-        bot_ = await TelegramClient('bot_', api_id, api_hash).start(bot_token=bot_token)
         while state:
-            await asyncio.sleep(1)
-            print('.')
-            if len(pending_messages)>0:
-                for id_us in pending_messages:
-                    
-                    if id_us not in user_dates:     
-                        user_dates[id_us]={}
-                    if 'remitent' not in user_dates[id_us]:
-                        user_dates[id_us]['remitent']=True
-                    if 'sleep_time' not in user_dates[id_us]:
-                        user_dates[id_us]['sleep_time']=1
+            try:
+                global user_dates
+                bot_ = await TelegramClient('bot_', api_id, api_hash).start(bot_token=bot_token)
+                await asyncio.sleep(1)
+                print('.')
+                if len(pending_messages)>0:
+                    for id_us in pending_messages:
+                        
+                        if id_us not in user_dates:     
+                            user_dates[id_us]={}
+                        if 'remitent' not in user_dates[id_us]:
+                            user_dates[id_us]['remitent']=True
+                        if 'sleep_time' not in user_dates[id_us]:
+                            user_dates[id_us]['sleep_time']=1
+                
+                        sleep_time= user_dates[id_us]['sleep_time']
             
-                    sleep_time= user_dates[id_us]['sleep_time']
-        
-                    if 'wait_time' not in user_dates[id_us]:
-                        user_dates[id_us]['wait_time']=1
-            
-                    wait_time= user_dates[id_us]['wait_time'] 
-                    if 'resend_loop' not in user_dates[id_us]:
-                        user_dates[id_us]['resend_loop']=0
-            
-                    resend_loop= user_dates[id_us]['resend_loop'] 
-                    user = TelegramClient(str(id_us), api_id, api_hash)
-                    
-                    await user.connect()
-                    
+                        if 'wait_time' not in user_dates[id_us]:
+                            user_dates[id_us]['wait_time']=1
+                
+                        wait_time= user_dates[id_us]['wait_time'] 
+                        if 'resend_loop' not in user_dates[id_us]:
+                            user_dates[id_us]['resend_loop']=0
+                
+                        resend_loop= user_dates[id_us]['resend_loop'] 
+                        user = TelegramClient(str(id_us), api_id, api_hash)
+                        
+                        await user.connect()
+                        
 
-                    msg_dates=pending_messages[id_us]
-                    index=0
-                    desv=0 
-                    for msg_date in msg_dates:
-                                    
-                                    programed_time=msg_date['time']
-                            #for programed_time in msg_date:
-                            #   if programed_time!='event':
-                                    event_message=msg_date['event']
-                                    msg=msg_date['msg']
+                        msg_dates=pending_messages[id_us]
+                        index=0
+                        desv=0 
+                        for msg_date in msg_dates:
+                                        
+                                        programed_time=msg_date['time']
+                                #for programed_time in msg_date:
+                                #   if programed_time!='event':
+                                        event_message=msg_date['event']
+                                        msg=msg_date['msg']
 
-                                    actual_time = time.time()
-                                    
+                                        actual_time = time.time()
+                                        
 
-                                    if float(actual_time)>=float(programed_time):
-                                        await asyncio.sleep(wait_time)
-                                        for group_id in group_ids[int(id_us)]:
-                                                print(group_id)
-                                            #try:
-                                                if user_dates[id_us]['remitent'] and event_message!='not_remitent':
+                                        if float(actual_time)>=float(programed_time):
+                                            await asyncio.sleep(wait_time)
+                                            for group_id in group_ids[int(id_us)]:
+                                                    print(group_id)
+                                                #try:
+                                                    if user_dates[id_us]['remitent'] and event_message!='not_remitent':
+                                                        
+                                                        await user.forward_messages(int(group_id),event_message)
+                                                    else:
+                                                        await user.send_message(int(group_id), msg,parse_mode='html')
+                                                    print('send')
                                                     
-                                                    await user.forward_messages(int(group_id),event_message)
-                                                else:
-                                                    await user.send_message(int(group_id), msg,parse_mode='html')
-                                                print('send')
+                                                    await asyncio.sleep(sleep_time)
+                                                #except Exception as e:
+                                                    #print()
                                                 
-                                                await asyncio.sleep(sleep_time)
-                                            #except Exception as e:
-                                                print()
-                                            
-                                
-                                        await bot_.send_message(int(id_us), "Mensaje reenviado")
                                     
-                                        if  resend_loop==0:
-                                            msg_dates.pop(index-desv)
-                                            desv+=1
-                                        else:
-                                            print('loop_resend')
-                                            msg_date['time']=programed_time+resend_loop
+                                            await bot_.send_message(int(id_us), "Mensaje reenviado")
+                                        
+                                            if  resend_loop==0:
+                                                msg_dates.pop(index-desv)
+                                                desv+=1
+                                            else:
+                                                print('loop_resend')
+                                                msg_date['time']=programed_time+resend_loop
+                                            
+                                    
+                                    
+                                        index+=1
+                                        
+                                        
+                                        
+                        
                                         
                                 
-                                
-                                    index+=1
-                                    
-                                    
-                                    
-                    
-                                    
-                            
-                    await user.disconnect()       
-    except Exception as e:
-        threading.Thread(target=main).start()
-        print(f'error{e}')
+                        await user.disconnect()       
+            except Exception as e:
+        #threading.Thread(target=main).start()
+                print(f'error{e}')
         
     
  
