@@ -48,7 +48,7 @@ async def login_(event,password="not_set"):
         await user.connect()
     except:
         await user.disconnect()
-        asyncio.sleep(1)
+        await asyncio.sleep(1)
         await user.connect()
         
     chat = await event.get_chat()
@@ -145,7 +145,7 @@ async def send_code(event):
         await user.connect()
     except:
         await user.disconnect()
-        asyncio.sleep(1)
+        await asyncio.sleep(1)
         await user.connect()
         
     chat = await event.get_chat()
@@ -191,7 +191,7 @@ async def get_groups(event):
         await user.connect()
     except:
         await user.disconnect()
-        asyncio.sleep(1)
+        await asyncio.sleep(1)
         await user.connect()
     
     chats = await user.get_dialogs()
@@ -228,7 +228,7 @@ async def login(event):
         await user.connect()
     except:
         await user.disconnect()
-        asyncio.sleep(1)
+        await asyncio.sleep(1)
         await user.connect()
     chat = await event.get_chat()
     
@@ -407,7 +407,7 @@ async def send_anounce(event):
         await user.connect()
     except:
         await user.disconnect()
-        asyncio.sleep(1)
+        await asyncio.sleep(1)
         await user.connect()
     chat = await event.get_chat()
     if sender.id not in user_dates:
@@ -547,7 +547,7 @@ async def handler(event):
                 await user.connect()
             except:
                 await user.disconnect()
-                asyncio.sleep(1)
+                await asyncio.sleep(1)
                 await user.connect()
             if sender.id not in menu_history:
                 menu_history[sender.id]=[message]
@@ -845,7 +845,7 @@ async def schedule_messages():
                             await user.connect()
                         except:
                             await user.disconnect()
-                            asyncio.sleep(1)
+                            await asyncio.sleep(1)
                             await user.connect()
                         
 
@@ -903,8 +903,9 @@ async def schedule_messages():
             except Exception as e:
                 print(f'error{e}')
                 print(state)
+                print(pending_messages)
                 try:
-                    asyncio.sleep(1)
+                    await asyncio.sleep(1)
                     await user.disconnect()
                 except:
                     print('desconectado')  
