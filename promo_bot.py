@@ -18,7 +18,7 @@ channel_ids_swap={}
 pending_messages = {}
 admins=[]
 bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
-#bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
+bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
 user_dates={}
 menu_system=[
     [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('💠 Conectar Canal',resize=True),Button.text('〽️ Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]],
@@ -253,6 +253,8 @@ async def add_chat(event):
         comand.pop(0)
         msg="Grupos agregados:\n"
         for id_chat in comand:
+            if "-" not in id_chat:
+                id_chat="-"+str(id_chat)
             if sender.id not in group_ids:
                 group_ids[sender.id]=[int(id_chat)]
             else:
@@ -276,6 +278,8 @@ async def add_channel(event):
         comand.pop(0)
         msg="Canal agregado:\n"
         for id_channel in comand:
+            if "-" not in id_channel:
+                id_channel="-"+str(id_channel)
             chat_ids.append(int(id_channel))
             if sender.id not in channel_ids:
                 channel_ids[sender.id]=[]
@@ -285,7 +289,11 @@ async def add_channel(event):
                     chanel_entity = await bot.get_entity(int(channel_ids[sender.id][0]))
                     if sender.id not in channel_ids_swap:
                         channel_ids_swap[sender.id]=[]
-                    channel_ids_swap[sender.id][0]=int(id_channel)
+                    if len(channel_ids_swap[sender.id])==0:
+                        channel_ids_swap[sender.id].append(1)
+                        
+                    channel_ids_swap[sender.id].pop(0)
+                    channel_ids_swap[sender.id].append(int(id_channel))
                     
                     keyboard = [Button.inline('〽️ Si', data=b'yes_swap_channel'),Button.inline('🚫 No', data=b'no_swap_channel')]
                     await event.respond(f'〽️ Usted ya configuro un canal de reenvío anteriormente!\n\n• <b>Su canal</b> - (ID del canal, con un enlace al canal de usuario, por ejemplo <a href="https://t.me/{chanel_entity.username}">{channel_ids[sender.id][0]}</a>)\n\n⁉️ Deseas eliminar esté canal y configurar otro:',buttons=keyboard,parse_mode='html')
@@ -323,7 +331,7 @@ async def time_(event):
             
         await event.respond(f'Tiempo de reenvio modiificado a {time} seg entre cada menaje')
         
-@bot.on(events.NewMessage(pattern='/resend_loop_time'))
+@bot.on(events.NewMessage(pattern='/ree'))
 async def resend_time_(event):
     sender = await event.get_sender()
     chat = await event.get_chat()
@@ -331,7 +339,7 @@ async def resend_time_(event):
     comand=message.split(' ')
     global user_dates
     if len(comand)==2:
-        time_=int(comand[1])
+        time_=int(comand[1])*60
     
         if sender.id not in user_dates:
             
@@ -521,7 +529,7 @@ async def handler(event):
             
         else:
             keyboard = [Button.inline('🧩 Conectar Cuenta', data=b'connect')]
-            await event.respond('🧩 Menú de Conectividad:\n\n• Utilice esto para forjar una conexión entre su cuenta y @CamarioBot.\n\n☑️ Una conexión con al menos una cuenta es esencial para utilizar los servicios.\n\n• Ingrese el número de teléfono asociado a la cuenta de Telegram, excluya el signo + del mensaje.\n\n♻️ Parámetros de Conexión:\n\n<code>/connect</code> (Número de teléfono sin el signo +)\n\n• <b>Ejemplo</b>:\n\n/connect 84 5555555\n\n🌐 Descubre el prefijo de cada país visitando este <a href="https://countrycode.org/">Enlace</a>\n\n• ¿No estás seguro de cómo proceder?\n\n⚙️ Contacte con <a href="http://t.me/CamarioAdmin">Soporte</a>\n\n🧩 Conecte su Cuenta:', buttons=keyboard,parse_mode='html',link_preview=False)
+            await event.respond('🧩 <b>Menú de Conectividad</b>:\n\n• Utilice esto para forjar una conexión entre su cuenta y @CamarioBot.\n\n• Una conexión con al menos una cuenta es esencial para utilizar los servicios.\n\n• Ingrese el número de teléfono asociado a la cuenta de Telegram, incluya el prefijo de país, elimine el espacio entre el prefijo y el número.\n\n💡 <b>Parámetros de Conexión</b>:\n\n<code>/connect</code> (Número de teléfono completo sin espacios)\n\n• <b>Ejemplo</b>: su número es <b>+84 55555</b>, debes enviar\n\n/connect +8455555\n\n🌐 <b>Descubre el prefijo de cada país visitando este </b><b><a href="https://countrycode.org/">Enlace</a></b>\n\n• No estás seguro de cómo proceder, contacte con <a href="http://t.me/CamarioAdmin">Soporte</a>.\n\n🧩 <b>Conecte su Cuenta</b>:', buttons=keyboard,parse_mode='html',link_preview=False)
 
     if message=='🚫 Cancel':
         keyboard = await menu_action('cancel',event)
@@ -530,12 +538,12 @@ async def handler(event):
     if message=='💠 Conectar Canal' or message=='/AgregarCanal':
         keyboard = [Button.inline('〽️ Conectar Canal',data=b'add_channel')]
        
-        await event.respond('💠 <b>Utilice esto para forjar una conexión entre su canal y </b><b>@CamarioBot</b>.\n\n• Una conexión con al menos un canal es esencial para utilizar los servicios de reenvío automático.\n\n🤖 <b>@Camariobot</b><b> deberá ser añadido como administrador en el canal configurado</b>!\n\n• Si no añade @Camariobot los servicios no funcionarán con normalidad.\n\n💡 <b>Parámetros de Conexión</b>:\n\n<code>/channel</code> (ID del Canal)\n\n• Ejemplo:\n\n/channel 1002065562952\n\n🔍 <b>Localice el ID de su canal utilizando </b><b>@ScanIDBot</b>.\n\n• ¿No estás seguro de cómo proceder? ¡Contacte con <b><a href="http://t.me/CamarioAdmin">Soporte</a></b>!\n\n💠 <b>Conecte</b> <b>un Canal</b>:',buttons=keyboard,parse_mode='html',link_preview=False)
+        await event.respond('💠 <b>Utilice esto para forjar una conexión entre su canal y </b>@CamarioBot.\n\n• Una conexión con al menos un canal es esencial para utilizar los servicios de reenvío automático.\n\n🤖 <b>@Camariobot</b><b> deberá ser añadido como administrador en el canal configurado</b>!\n\n• Si no añade @Camariobot los servicios no funcionarán con normalidad.\n\n💡 <b>Parámetros de Conexión</b>:\n\n<code>/channel</code> (ID del Canal)\n\n• <b>Ejemplo</b>:\n\n/channel 1002065562952\n\n🔍 <b>Localice el ID de su canal utilizando </b>@ScanIDBot.\n\n• ¿No estás seguro de cómo proceder?Contacte con <a href="http://t.me/CamarioAdmin">Soporte</a>.\n\n💠 <b>Conecte</b> <b>un Canal</b>:',buttons=keyboard,parse_mode='html',link_preview=False)
         
     if message=='〽️ Agregar Grupos' or message=='/AgregarGrupos':  
         keyboard = [[Button.inline('〽️ Agregar Grupos',data=b'add_group')]]
         
-        await event.respond('〽️ ¡<b>Agrega el ID de los grupos a los cuales se reenviarán las publicaciones</b>!\n\n• Deberá ser miembro de todos los grupos agregados.\n\n• No existe un límite de grupos para reenviar publicaciones.\n\n• Para editar, eliminar o agregar nuevos grupos debera dirigirse ha "⚙️Configuración".\n\n💡 <b>Parámetros de Conexión</b>:\n\n/id (ID de los grupos, separe con un espacio cada ID)\n\n• <b>Ejemplo</b>:\n\n/id 1001256118443 1001484740111\n\n• ¿No estás seguro de cómo proceder? ¡Contacte con <b><a href="http://t.me/CamarioAdmin">Soporte</a></b>!\n\n〽️ Agregue los Grupos:',buttons=keyboard,parse_mode='html',link_preview=False)
+        await event.respond('〽️ ¡<b>Agrega el ID de los grupos a los cuales se reenviarán las publicaciones</b>!\n\n• Deberá ser miembro de todos los grupos agregados.\n\n• No existe un límite de grupos para reenviar publicaciones.\n\n• Para editar, eliminar o agregar nuevos grupos debera dirigirse ha "⚙️Configuración".\n\n💡 <b>Parámetros de Conexión</b>:\n\n/id (ID de los grupos, separe con un espacio cada ID)\n\n• <b>Ejemplo</b>:\n\n/id 1001256118443 1001484740111\n\n• ¿No estás seguro de cómo proceder? Contacte con <a href="http://t.me/CamarioAdmin">Soporte</a>.\n\n〽️ <b>Agregue los Grupos</b>:',buttons=keyboard,parse_mode='html',link_preview=False)
 
     if message=='⚙️ Configuración':
         keyboard = menu_system[1]
@@ -663,7 +671,7 @@ async def callback_handler(event):
     if event.data == b'more_time':
 
         keyboard = [Button.text('🚫 Cancel', resize=True)]
-        await event.respond('🕖 El tiempo máximo de espera es de 30 minutos (1800 segundos)\n\n• <b>Ejemplo</b>, el tiempo que deseas agregar es de 60 segundos enviarás:\n\n/time 60\n\n⏳ • Envía ahora el número de segundos que deben pasar entre cada reenvío:',buttons=keyboard,parse_mode='html')
+        await event.respond('⏰ El tiempo mínimo de espera entre reenvíos es de (30 minutos)\n\n• Si deseas agregar un intervalo de reenvío de 60 minutos el formato correcto es:\n\n/ree 60\n\n⏱️ Envía el número de minutos que deben pasar entre cada reenvío, recuerde utilizar el comando <code>/ree</code>:',buttons=keyboard,parse_mode='html')
     
     
     if event.data == b'add_group':
