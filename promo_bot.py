@@ -18,7 +18,7 @@ channel_ids_swap={}
 pending_messages = {}
 admins=[]
 bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
-bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
+#bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
 user_dates={}
 menu_system=[
     [[Button.text('🧩 Conectar Cuenta',resize=True)],[Button.text('💠 Conectar Canal',resize=True),Button.text('〽️ Agregar Grupos',resize=True)],[Button.text('⚙️ Configuración',resize=True)]],
@@ -28,6 +28,7 @@ menu_system=[
 menu_history={}
 # Iniciar sesión como bot
 bot = TelegramClient('bot', api_id, api_hash).start(bot_token=bot_token)
+
 phone_code_hash_=""
 # Iniciar sesión como usuario
 #user = TelegramClient('user', api_id, api_hash)
@@ -774,11 +775,11 @@ async def callback_handler(event):
  
  
 async def schedule_messages():
-        
+        bot_ =await TelegramClient('bot_', api_id, api_hash).start(bot_token=bot_token)
         while state:
             try:
                 global user_dates
-                bot_ = await TelegramClient('bot_', api_id, api_hash).start(bot_token=bot_token)
+                
                 await asyncio.sleep(1)
                 print('.')
                 if len(pending_messages)>0:
@@ -854,7 +855,7 @@ async def schedule_messages():
                                         
                         
                                         
-                                
+                          
                         await user.disconnect()       
             except Exception as e:
         #threading.Thread(target=main).start()
