@@ -6,7 +6,7 @@ from keep_alive import keep_alive
 import time
 import threading
 keep_alive()
-
+state=True
 import telethon
 import asyncio
 api_id = '16620070'
@@ -468,7 +468,14 @@ async def handle_channels_new_message(event):
             timestamp=time.time()
             #date_in={timestamp:msg,'event':event.message}
             date_in={'time':timestamp,'msg':msg,'event':event.message}
+            global state
+            state=False
+            await asyncio.sleep(3)
             pending_messages[user_id].append(date_in)
+            await asyncio.sleep(1)
+            state=True
+           
+            
             
             #for group_id in group_ids[user_id]:
                 
@@ -760,8 +767,9 @@ async def schedule_messages():
         global user_dates
         
         bot_ = await TelegramClient('bot_', api_id, api_hash).start(bot_token=bot_token)
-        while True:
-            #print('.')
+        while state:
+            await asyncio.sleep(1)
+            print('.')
             if len(pending_messages)>0:
                 for id_us in pending_messages:
                     
@@ -804,8 +812,8 @@ async def schedule_messages():
                                     if float(actual_time)>=float(programed_time):
                                         await asyncio.sleep(wait_time)
                                         for group_id in group_ids[int(id_us)]:
-                                            print(group_id)
-                                            try:
+                                                print(group_id)
+                                            #try:
                                                 if user_dates[id_us]['remitent'] and event_message!='not_remitent':
                                                     
                                                     await user.forward_messages(int(group_id),event_message)
@@ -814,8 +822,8 @@ async def schedule_messages():
                                                 print('send')
                                                 
                                                 await asyncio.sleep(sleep_time)
-                                            except Exception as e:
-                                                print(e)
+                                            #except Exception as e:
+                                                print()
                                             
                                 
                                         await bot_.send_message(int(id_us), "Mensaje reenviado")
@@ -838,7 +846,8 @@ async def schedule_messages():
                             
                     await user.disconnect()       
     except Exception as e:
-        print(e)
+        threading.Thread(target=main).start()
+        print(f'error{e}')
         
     
  
