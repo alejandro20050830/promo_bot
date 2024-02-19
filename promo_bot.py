@@ -853,6 +853,7 @@ async def schedule_messages():
                         index=0
                         desv=0 
                         for msg_date in msg_dates:
+                                        not_errors=True
                                         
                                         programed_time=msg_date['time']
                                 #for programed_time in msg_date:
@@ -866,8 +867,8 @@ async def schedule_messages():
                                         if float(actual_time)>=float(programed_time):
                                             await asyncio.sleep(wait_time)
                                             for group_id in group_ids[int(id_us)]:
-                                                    print(group_id)
-                                                #try:
+                                                print(group_id)
+                                                try:
                                                     if user_dates[id_us]['remitent'] and event_message!='not_remitent':
                                                         
                                                         await user.forward_messages(int(group_id),event_message)
@@ -876,13 +877,16 @@ async def schedule_messages():
                                                     print('send')
                                                     
                                                     await asyncio.sleep(sleep_time)
-                                                #except Exception as e:
-                                                    #print()
+                                                except Exception as e:
+                                                    not_errors=False
+                                                    print(f"resend_error:{e}")
                                                 
-                                    
-                                            await bot_.send_message(int(id_us), "Mensaje reenviado")
+                                            if not_errors:
+                                                await bot_.send_message(int(id_us), "Mensaje reenviado")
+                                            else:
+                                                await bot_.send_message(int(id_us), "Error en el reenvio")
                                         
-                                            if  resend_loop==0:
+                                            if  resend_loop==0 and not_errors:
                                                 msg_dates.pop(index-desv)
                                                 desv+=1
                                             else:
