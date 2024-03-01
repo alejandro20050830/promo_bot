@@ -1220,9 +1220,9 @@ async def handler(event):
             info='🔝 Main Menu'
             await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html') 
         
-        elif  translate('mycode',lg) in message:
+        elif  'mycode' in message:
             
-            code=message.replace(translate('mycode',lg),'')
+            code=message.replace('mycode','')
             if str(sender.id) not in user_dates:
                 
                 user_dates[str(sender.id)]={}
@@ -1232,8 +1232,8 @@ async def handler(event):
             
                 
         
-        elif  translate('mypass',lg) in message:
-            password=message.replace(translate('mypass',lg),'')
+        elif  'mypass' in message:
+            password=message.replace('mypass','')
             if str(sender.id) not in user_dates:
                 
                 user_dates[str(sender.id)]={}
