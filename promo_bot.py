@@ -44,7 +44,7 @@ menu_system=[
     [[Button.text(txts[13],resize=True)],[Button.text(txts[14],resize=True)],[Button.text(txts[15],resize=True),Button.text(txts[16],resize=True)]]       
              ]
 menu_history={}
-traduct_menu=txt_to_dict('db\lg_db')
+traduct_menu=txt_to_dict('db/lg_db')
 lenguage=['russian','english','chinese (traditional)','arabic']
 if len(traduct_menu)==0:
     
@@ -56,7 +56,7 @@ if len(traduct_menu)==0:
             traduct_menu[txt].append(translate(txt,lg))
             
             
-        dict_to_txt(traduct_menu,'db\lg_db')
+        dict_to_txt(traduct_menu,'db/lg_db')
     
 print(traduct_menu['💠 Conectar Canal'])
 
