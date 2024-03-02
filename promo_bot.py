@@ -164,7 +164,7 @@ async def upload_db():
                 await user.disconnect()
             except:
                 print('error disconect in upload')
-       
+            asyncio.sleep(3)
     while True:
         try:
             messages =await user.get_messages(-1002000640381, filter=InputMessagesFilterDocument, limit=10)
@@ -1071,7 +1071,8 @@ async def handler(event):
         if str(sender.id) not in user_dates:
             
             user_dates[str(sender.id)]={}
-           
+        if 'beginner' not in user_dates[user_id]:
+            user_dates[user_id]['beginner']=True
         if 'status' not in user_dates[user_id]:
             user_dates[user_id]['status']={} 
             user_dates[user_id]['status']['cat']='basic'    
@@ -1307,11 +1308,14 @@ async def callback_handler(event):
     
     chat_id = event.chat_id
     sender = await event.get_sender()
-    user_id=str(sender.id)    
+    user_id=str(sender.id)   
+     
     if str(sender.id) not in user_dates:
             
             user_dates[str(sender.id)]={}
-    
+            
+    if 'beginner' not in user_dates[user_id]:
+        user_dates[user_id]['beginner']=True
     if 'status' not in user_dates[user_id]:
         user_dates[user_id]['status']={} 
         user_dates[user_id]['status']['cat']='basic'    
@@ -1526,6 +1530,7 @@ async def callback_handler(event):
         user_id=str(sender.id)
         user_dates[user_id]['leng']='english'
         await upload_db()
+        
         if user_dates[str(sender.id)]['beginner']:
             user_dates[str(sender.id)]['beginner']=False
             await start(event,beginner=True)
