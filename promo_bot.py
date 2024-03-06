@@ -210,6 +210,14 @@ async def upload_db():
         user.disconnect() 
         on_saving=False
     
+            
+@bot.on(events.NewMessage(pattern='/reset_db'))
+async def reset_db(event):
+    global user_dates
+    user_dates={}
+    user_dates['chat_ids']=[]
+    await upload_db()
+    
      
 async def login_(event,password="not_set"):
     # Solicitar número de teléfono
@@ -1252,8 +1260,8 @@ async def handler(event):
     sender = await event.get_sender()
     user_id=str(sender.id)
     await init_dates()
-    
-    if "-" not in str(sender.id):
+    message = event.raw_text
+    if "-" not in str(sender.id) and "/start" not in message :
         
         global user_dates
         if str(sender.id) not in user_dates:
@@ -1279,7 +1287,7 @@ async def handler(event):
         # Este bloque de código se ejecutará cada vez que llegue un nuevo mensaje
         chat = await event.get_chat()
     
-        message = event.raw_text
+        
         
         #user = TelegramClient(str(sender.id), api_id, api_hash)
         #await user.connect()
@@ -1968,6 +1976,7 @@ async def callback_handler(event):
                     
                     await bot.edit_message(id_chat,id_msg,msg,parse_mode='html')
                     user_dates[str(sender.id)]['beginner_trial']=False
+                    await upload_db()
                     
         else:
             
