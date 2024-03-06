@@ -39,7 +39,7 @@ channel_ids_swap={}
 admins=[]
 admin_wallet=''
 bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
-bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
+#bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
 test_mode=True
 on_saving=False
 txts=['🧩 Conectar Cuenta','💠 Conectar Canal','〽️ Agregar Grupos','⚙️ Configuración','👛 Suscripción','👁️ Remitente','⏳ Espera','🕖 Reenvío','✏️ Editar Grupos','🔰 Referidos','Siguiente ➡️','🔙 Volver','🔝 Menú principal','🧩 Más Cuentas','〽️ Más Canales','🔙 Volver','🔝 Menú principal','🚫 Cancel','🔖 Crear Mensaje','📮 Notificaciones','🔘 Pausar Reenvío','🖲️ Compartir Suscripción']
@@ -427,7 +427,7 @@ async def deposit_check():
                                         
                                      
                                     msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nFee:{fee_usd}\nCripto:{cripto_payed}\nStatus: {user_dates[id_]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
-                                    
+                                    msg=f'🎉 ¡Disfrute su suscripción!\n\n• Crypto - {cripto_payed}\n• Pagado - ={payed_usd} USD\n• Suscripción - {user_dates[id_]["status"]["cat"]}\n• Vencimiento - {fecha_formateada}'  
                                     await bot_.send_message(int(id_), translate(msg,lg),parse_mode='html')
                                     await upload_db()
                                 else:
@@ -1620,7 +1620,7 @@ async def callback_handler(event):
                 payed_usd=5
                                     
                                      
-                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                msg=f'🎉 ¡Disfrute su suscripción!\n\n• Pagado - ={payed_usd} USD\n• Suscripción - {user_dates[user_id]["status"]["cat"]}\n• Vencimiento - {fecha_formateada}' 
                                     
                 await bot.send_message(int(user_id), translate(msg,lg),parse_mode='html')
                 await upload_db()
@@ -1652,7 +1652,7 @@ async def callback_handler(event):
                 payed_usd=9
                                     
                                      
-                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                msg=f'🎉 ¡Disfrute su suscripción!\n\n• Pagado - ={payed_usd} USD\n• Suscripción - {user_dates[user_id]["status"]["cat"]}\n• Vencimiento - {fecha_formateada}' 
                                     
                 await bot.send_message(int(user_id), translate(msg,lg),parse_mode='html')
                 await upload_db()  
@@ -1684,7 +1684,7 @@ async def callback_handler(event):
                 payed_usd=75
                                     
                                      
-                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                msg=f'🎉 ¡Disfrute su suscripción!\n\n• Pagado - ={payed_usd} USD\n• Suscripción - {user_dates[user_id]["status"]["cat"]}\n• Vencimiento - {fecha_formateada}' 
                                     
                 await bot.send_message(int(user_id), translate(msg,lg),parse_mode='html')
                 await upload_db()
@@ -1856,7 +1856,7 @@ async def callback_handler(event):
                 payed_usd=5
                                     
                                      
-                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                msg=f'🎉 ¡Disfrute su suscripción!\n\n• Pagado - ={payed_usd} USD\n• Suscripción - {user_dates[user_id]["status"]["cat"]}\n• Vencimiento - {fecha_formateada}' 
                                     
                 await event.respond(translate(msg,lg),parse_mode='html')
                 await upload_db()
@@ -1888,7 +1888,7 @@ async def callback_handler(event):
                 payed_usd=9
                                     
                                      
-                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                msg=f'🎉 ¡Disfrute su suscripción!\n\n• Pagado - ={payed_usd} USD\n• Suscripción - {user_dates[user_id]["status"]["cat"]}\n• Vencimiento - {fecha_formateada}' 
                                     
                 await event.respond(translate(msg,lg),parse_mode='html')
                 await upload_db()  
@@ -1920,7 +1920,7 @@ async def callback_handler(event):
                 payed_usd=75
                                     
                                      
-                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                msg=f'🎉 ¡Disfrute su suscripción!\n\n• Pagado - ={payed_usd} USD\n• Suscripción - {user_dates[user_id]["status"]["cat"]}\n• Vencimiento - {fecha_formateada}' 
                                     
                 await event.respond(translate(msg,lg),parse_mode='html')
                 await upload_db()
