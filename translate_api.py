@@ -23,9 +23,9 @@ def translate(text, to_language='spanish'):
         for i in range(len(words)):
             word_=words[i].split('\n')
             for w in word_:           
-                if ('/' in w and '</' not in w) or 'http' in w or '@' in w:
+                if ('/' in w and ('</' not in w or w.count('/')>1)) or 'http' in w or '@' in w:
                     print(w)
-                    words_to_exclude.append(w.replace('\n',' '))  
+                    words_to_exclude.append(w.replace('\n',''))  
                                
         translated_text=GoogleTranslator(source='auto', target=to_language).translate(text)
         for exc in words_to_exclude:
