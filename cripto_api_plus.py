@@ -35,7 +35,7 @@ def crear_factura(amount,Test=False):
         #'accepted_assets':["BTC","TRX","USDT"],
         'amount': amount,  # Cantidad en la moneda especificada
         
-        'description': 'Pago de servicios'  # Descripción de la factura
+        'description': 'Enjoy our services for 1 Month!\n\n💠 Enjoy the services of @Camario for 2 Months!\n\n💠 Enjoy all our services for 3 months!\n\nColoca el que mejor queda a tu opinión'  # Descripción de la factura
     }
 
     response = requests.get(url, headers=headers,params=data)

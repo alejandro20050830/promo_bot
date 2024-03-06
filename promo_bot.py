@@ -39,7 +39,7 @@ channel_ids_swap={}
 admins=[]
 admin_wallet=''
 bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
-#bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
+bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
 test_mode=True
 on_saving=False
 txts=['🧩 Conectar Cuenta','💠 Conectar Canal','〽️ Agregar Grupos','⚙️ Configuración','👛 Suscripción','👁️ Remitente','⏳ Espera','🕖 Reenvío','✏️ Editar Grupos','🔰 Referidos','Siguiente ➡️','🔙 Volver','🔝 Menú principal','🧩 Más Cuentas','〽️ Más Canales','🔙 Volver','🔝 Menú principal','🚫 Cancel','🔖 Crear Mensaje','📮 Notificaciones','🔘 Pausar Reenvío','🖲️ Compartir Suscripción']
@@ -337,6 +337,7 @@ def deposit_check_(user_address,admin_address):
         
   
 async def deposit_check():
+    global user_dates
     bot_ =await TelegramClient('bot_dep', api_id, api_hash).start(bot_token=bot_token)
     while True:
             print('-')
@@ -352,6 +353,9 @@ async def deposit_check():
                                                          
                         if 'saldo' not in user_dates[id_]:
                                 user_dates[id_]['saldo']=0
+                        if 'saldo_ref' not in user_dates[id_]:
+                                user_dates[id_]['saldo_ref']=0
+
                         if 'status' not in user_dates[id_]:
                             user_dates[id_]['status']={} 
                             user_dates[id_]['status']['cat']='basic'    
@@ -368,7 +372,7 @@ async def deposit_check():
                                     msg='💠 Su servicio gratis ha concluido, el precio para utilizar los servicios de @Camariobot es de:\n\n5 USD ✖️ 1 Mes 👛'
                                     user_dates[id_]['status']['cat_historial']=['trial']
                                     keyboard_inline = [Button.inline(translate('👛 Pagar',lg), data=b'buy_premium1')]
-                                    await bot_.send_message(int(id_), translate(msg,lg),butons=keyboard_inline,parse_mode='html')   
+                                    await bot_.send_message(int(id_), translate(msg,lg),buttons=keyboard_inline,parse_mode='html')   
                                 user_dates[id_]['status']['lote']=0
                                 user_dates[id_]['status']['buyed']=0
                                 user_dates[id_]['status']['cat']='basic'  
@@ -386,11 +390,12 @@ async def deposit_check():
                                     cripto_payed=verify_resp['result']['items'][0]['paid_asset']
                                     print(f"----------PAYED-------------\nReal_recived={payed_usd}USD\nFee:{fee_usd}\nCripto:{cripto_payed}")
                                     user_dates[id_]['saldo']+=float(payed_usd)
+                                    
                                     if user_dates[id_]['invitator']!="None":
-                                        if 'saldo' not in user_dates[str(user_dates[id_]['invitator'])]:
-                                            user_dates[str(user_dates[id_]['invitator'])]['saldo']=0
-                                            
-                                        user_dates[str(user_dates[id_]['invitator'])]['saldo']+=float(payed_usd)*0.25
+                                        if 'saldo_ref' not in user_dates[str(user_dates[id_]['invitator'])]:
+                                            user_dates[str(user_dates[id_]['invitator'])]['saldo_ref']=0
+
+                                        user_dates[str(user_dates[id_]['invitator'])]['saldo_ref']+=float(payed_usd)*0.25
                                     
             
                                     user_dates[id_]['invoice_id']="None"
@@ -399,17 +404,17 @@ async def deposit_check():
                                     print(round(float(payed_usd)))
                                     if int(payed_usd)==5:
                                         
-                                        user_dates[id_]['status']['lote']+=60*60*24*30
+                                        user_dates[id_]['status']['lote']+=60*60*24*25
                                         if  user_dates[id_]['status']['buyed']==0:
                                                 user_dates[id_]['status']['buyed']=time.time()
                                         
                                     if int(payed_usd)==9:
-                                        user_dates[id_]['status']['lote']+=60*60*24*60
+                                        user_dates[id_]['status']['lote']+=60*60*24*50
                                         if  user_dates[id_]['status']['buyed']==0:
                                                 user_dates[id_]['status']['buyed']=time.time()
                                         
                                     if int(payed_usd)==12:
-                                        user_dates[id_]['status']['lote']+=60*60*24*90
+                                        user_dates[id_]['status']['lote']+=60*60*24*75
                                         if  user_dates[id_]['status']['buyed']==0:
                                             user_dates[id_]['status']['buyed']=time.time()
 
@@ -1292,7 +1297,7 @@ async def handler(event):
         #user = TelegramClient(str(sender.id), api_id, api_hash)
         #await user.connect()
         if message in traduct_menu["👛 Suscripción"] or message=='/Suscripcion':
-                keyboard = [[Button.inline(translate('🔘 1 Mes - $5',lg), data=b'buy_premium1')],[Button.inline(translate('🔰  2 Meses - $9',lg), data=b'buy_premium2'),Button.inline(translate('🧩 3 Meses - $12',lg), data=b'buy_premium3')]] 
+                keyboard = [[Button.inline(translate('1 Mes - $5',lg), data=b'buy_premium1')],[Button.inline(translate('2 Meses - $9',lg), data=b'buy_premium2'),Button.inline(translate('3 Meses - $12',lg), data=b'buy_premium3')]] 
                 info="👛 Elige un período de suscripción:"
                 await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')  
                 return 0
@@ -1336,7 +1341,7 @@ async def handler(event):
                 await event.respond(translate('🚫 Cancel',lg),buttons=keyboard)
             
             elif message in traduct_menu['💠 Conectar Canal'] or message=='/AgregarCanal':
-                keyboard = [Button.inline(translate('〽️ Conectar Canal' ,lg),data=b'add_channel')]
+                keyboard = [Button.inline(translate('💠 Conectar Canal Conectar Canal' ,lg),data=b'add_channel')]
                 info='💠 <b>Utilice esto para forjar una conexión entre su canal y </b>@CamarioBot.\n\n• Una conexión con al menos un canal es esencial para utilizar los servicios de reenvío automático.\n\n🤖 <b>@Camariobot</b><b> deberá ser añadido como administrador en el canal configurado</b>!\n\n• Si no añade @Camariobot los servicios no funcionarán con normalidad.\n\n💡 <b>Parámetros de Conexión</b>:\n\n<code>/channel</code> (ID del Canal)\n\n• <b>Ejemplo</b>:\n\n/channel 1002065562952\n\n🔍 <b>Localice el ID de su canal utilizando </b>@ScanIDBot.\n\n• ¿No estás seguro de cómo proceder?Contacte con <a href="http://t.me/CamarioAdmin">Soporte</a>.\n\n💠 <b>Conecte</b> <b>un Canal</b>:'
                 await event.respond(translate(info ,lg) ,buttons=keyboard,parse_mode='html',link_preview=False)
                 
@@ -1393,7 +1398,7 @@ async def handler(event):
                 info=f'⏳ <b>Espera PreEnvío</b>.\n\n• Tiempo: {wait_time} Segundos \n\n💡 <b>La espera previa al reenvío te permite establecer un retraso entre el envío de la publicación en el canal y el reenvío en los grupos</b>.\n\n• Dentro de esos segundos puedes editar el mensaje o eliminarlo antes de que se reenvié.\n\n• Tenga en cuenta que el tiempo de espera transcurre solo entre la recepción y el reenvío de ese único mensaje.'
                 await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html')
             
-            elif message=='🕖 Reenvío':
+            elif message==traduct_menu['🕖 Reenvío']:
                 if sender.id not in menu_history:
                     menu_history[sender.id]=[message]
                 else:
@@ -1589,13 +1594,100 @@ async def callback_handler(event):
         keyboard = await get_custom_menu(event)
         keyboard=keyboard[1]
         if event.data == b'buy_premium1':
-            await deposit_solicity(event,5) 
+            if 'status' not in user_dates[user_id]:
+                user_dates[user_id]['status']={} 
+                user_dates[user_id]['status']['cat']='basic'    
+                user_dates[user_id]['status']['lote']=0
+                user_dates[user_id]['status']['buyed']=0
+            if 'saldo_ref' not in user_dates[user_id]:
+                user_dates[user_id]['saldo_ref']=0
+            if user_dates[user_id]['saldo_ref']<5:
+                await deposit_solicity(event,5) 
+            else:
+                user_dates[user_id]['saldo_ref']-=5
+                user_dates[user_id]['status']['cat']='premium'
+                user_dates[user_id]['status']['lote']+=60*60*24*25
+                if  user_dates[user_id]['status']['buyed']==0:
+                    user_dates[user_id]['status']['buyed']=time.time()
+                
+                
+                fecha = datetime.fromtimestamp(user_dates[user_id]['status']['buyed']+user_dates[user_id]['status']['lote'])
+
+
+                fecha_formateada = fecha.strftime('%Y-%m-%d %H:%M:%S')
+                if  user_dates[user_id]['status']['lote']==0:
+                    fecha_formateada="No premium activo"
+                payed_usd=5
+                                    
+                                     
+                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                                    
+                await bot.send_message(int(user_id), translate(msg,lg),parse_mode='html')
+                await upload_db()
             return 0
         if event.data == b'buy_premium2': 
-            await deposit_solicity(event,9)   
+            if 'status' not in user_dates[user_id]:
+                user_dates[user_id]['status']={} 
+                user_dates[user_id]['status']['cat']='basic'    
+                user_dates[user_id]['status']['lote']=0
+                user_dates[user_id]['status']['buyed']=0
+            if 'saldo_ref' not in user_dates[user_id]:
+                user_dates[user_id]['saldo_ref']=0
+            if user_dates[user_id]['saldo_ref']<9:
+                await deposit_solicity(event,9) 
+            else:
+                user_dates[user_id]['saldo_ref']-=9
+                user_dates[user_id]['status']['cat']='premium'
+                user_dates[user_id]['status']['lote']+=60*60*24*50
+                if  user_dates[user_id]['status']['buyed']==0:
+                    user_dates[user_id]['status']['buyed']=time.time()
+                
+                
+                fecha = datetime.fromtimestamp(user_dates[user_id]['status']['buyed']+user_dates[user_id]['status']['lote'])
+
+
+                fecha_formateada = fecha.strftime('%Y-%m-%d %H:%M:%S')
+                if  user_dates[user_id]['status']['lote']==0:
+                    fecha_formateada="No premium activo"
+                payed_usd=9
+                                    
+                                     
+                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                                    
+                await bot.send_message(int(user_id), translate(msg,lg),parse_mode='html')
+                await upload_db()  
             return 0
         if event.data == b'buy_premium3': 
-            await deposit_solicity(event,12)  
+            if 'status' not in user_dates[user_id]:
+                user_dates[user_id]['status']={} 
+                user_dates[user_id]['status']['cat']='basic'    
+                user_dates[user_id]['status']['lote']=0
+                user_dates[user_id]['status']['buyed']=0
+            if 'saldo_ref' not in user_dates[user_id]:
+                user_dates[user_id]['saldo_ref']=0
+            if user_dates[user_id]['saldo_ref']<12:
+                await deposit_solicity(event,12) 
+            else:
+                user_dates[user_id]['saldo_ref']-=5
+                user_dates[user_id]['status']['cat']='premium'
+                user_dates[user_id]['status']['lote']+=60*60*24*75
+                if  user_dates[user_id]['status']['buyed']==0:
+                    user_dates[user_id]['status']['buyed']=time.time()
+                
+                
+                fecha = datetime.fromtimestamp(user_dates[user_id]['status']['buyed']+user_dates[user_id]['status']['lote'])
+
+
+                fecha_formateada = fecha.strftime('%Y-%m-%d %H:%M:%S')
+                if  user_dates[user_id]['status']['lote']==0:
+                    fecha_formateada="No premium activo"
+                payed_usd=75
+                                    
+                                     
+                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                                    
+                await bot.send_message(int(user_id), translate(msg,lg),parse_mode='html')
+                await upload_db()
             return 0 
         info="Su plan ha concluido por favor compre uno para poder seguir utilizando el bot.\nDirijase a la seccion 👛 Suscripción o presione el comando /Suscripcion para realizar la compra "
         await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')  
@@ -1678,7 +1770,7 @@ async def callback_handler(event):
         await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')
     if event.data == b'add_channel':
         keyboard = [Button.text(translate('🚫 Cancel',lg), resize=True)]
-        info='💠 <b>Recuerde añadir a </b><b>@Camariobot</b><b> en el canal</b> <b>agregado</b>!\n\n💡 <b>Deberás ingresar el ID del canal luego del comando</b> <code>/chanel</code>\n\n• Ejemplo:\n\n/chanel 1001368540342\n\n🔎 <b>Ingrese el</b> ID <b>del Canal</b>:'
+        info='💠 <b>Recuerde añadir a </b><b>@Camariobot</b><b> en el canal</b> <b>agregado</b>!\n\n💡 <b>Deberás ingresar el ID del canal luego del comando</b> <code>/channel</code>\n\n• Ejemplo:\n\n/channel 1001368540342\n\n🔎 <b>Ingrese el</b> ID <b>del Canal</b>:'
         await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')
     
     if event.data == b'more_accounts':
@@ -1738,12 +1830,101 @@ async def callback_handler(event):
         
                 
     if event.data == b'buy_premium1':
-        
-        await deposit_solicity(event,5) 
+            if 'status' not in user_dates[user_id]:
+                user_dates[user_id]['status']={} 
+                user_dates[user_id]['status']['cat']='basic'    
+                user_dates[user_id]['status']['lote']=0
+                user_dates[user_id]['status']['buyed']=0
+            if 'saldo_ref' not in user_dates[user_id]:
+                user_dates[user_id]['saldo_ref']=0
+            if user_dates[user_id]['saldo_ref']<5:
+                await deposit_solicity(event,5) 
+            else:
+                user_dates[user_id]['saldo_ref']-=5
+                user_dates[user_id]['status']['cat']='premium'
+                user_dates[user_id]['status']['lote']+=60*60*24*25
+                if  user_dates[user_id]['status']['buyed']==0:
+                    user_dates[user_id]['status']['buyed']=time.time()
+                
+                
+                fecha = datetime.fromtimestamp(user_dates[user_id]['status']['buyed']+user_dates[user_id]['status']['lote'])
+
+
+                fecha_formateada = fecha.strftime('%Y-%m-%d %H:%M:%S')
+                if  user_dates[user_id]['status']['lote']==0:
+                    fecha_formateada="No premium activo"
+                payed_usd=5
+                                    
+                                     
+                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                                    
+                await event.respond(translate(msg,lg),parse_mode='html')
+                await upload_db()
+            
     if event.data == b'buy_premium2': 
-        await deposit_solicity(event,9)   
+            if 'status' not in user_dates[user_id]:
+                user_dates[user_id]['status']={} 
+                user_dates[user_id]['status']['cat']='basic'    
+                user_dates[user_id]['status']['lote']=0
+                user_dates[user_id]['status']['buyed']=0
+            if 'saldo_ref' not in user_dates[user_id]:
+                user_dates[user_id]['saldo_ref']=0
+            if user_dates[user_id]['saldo_ref']<9:
+                await deposit_solicity(event,9) 
+            else:
+                user_dates[user_id]['saldo_ref']-=9
+                user_dates[user_id]['status']['cat']='premium'
+                user_dates[user_id]['status']['lote']+=60*60*24*50
+                if  user_dates[user_id]['status']['buyed']==0:
+                    user_dates[user_id]['status']['buyed']=time.time()
+                
+                
+                fecha = datetime.fromtimestamp(user_dates[user_id]['status']['buyed']+user_dates[user_id]['status']['lote'])
+
+
+                fecha_formateada = fecha.strftime('%Y-%m-%d %H:%M:%S')
+                if  user_dates[user_id]['status']['lote']==0:
+                    fecha_formateada="No premium activo"
+                payed_usd=9
+                                    
+                                     
+                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                                    
+                await event.respond(translate(msg,lg),parse_mode='html')
+                await upload_db()  
+            
     if event.data == b'buy_premium3': 
-        await deposit_solicity(event,12)         
+            if 'status' not in user_dates[user_id]:
+                user_dates[user_id]['status']={} 
+                user_dates[user_id]['status']['cat']='basic'    
+                user_dates[user_id]['status']['lote']=0
+                user_dates[user_id]['status']['buyed']=0
+            if 'saldo_ref' not in user_dates[user_id]:
+                user_dates[user_id]['saldo_ref']=0
+            if user_dates[user_id]['saldo_ref']<12:
+                await deposit_solicity(event,12) 
+            else:
+                user_dates[user_id]['saldo_ref']-=5
+                user_dates[user_id]['status']['cat']='premium'
+                user_dates[user_id]['status']['lote']+=60*60*24*75
+                if  user_dates[user_id]['status']['buyed']==0:
+                    user_dates[user_id]['status']['buyed']=time.time()
+                
+                
+                fecha = datetime.fromtimestamp(user_dates[user_id]['status']['buyed']+user_dates[user_id]['status']['lote'])
+
+
+                fecha_formateada = fecha.strftime('%Y-%m-%d %H:%M:%S')
+                if  user_dates[user_id]['status']['lote']==0:
+                    fecha_formateada="No premium activo"
+                payed_usd=75
+                                    
+                                     
+                msg=f"----------PAYED-------------\nReal_recived={payed_usd}USD\nStatus: {user_dates[user_id]['status']['cat']} \nVencimiento del premium: {fecha_formateada}"
+                                    
+                await event.respond(translate(msg,lg),parse_mode='html')
+                await upload_db()
+             
         
           
     if event.data == b'yes_swap_channel':
@@ -1841,8 +2022,22 @@ async def callback_handler(event):
         await upload_db()
         
     if event.data == b'pause_auto_send':
+        keyboard = [Button.inline(translate('💠 Activar',lg), data=b'on_auto_resend')]
+        info='⚠️ ¡<b>Actualmente el reenvío automático está pausado</b>!\n\n• Nota:\n\n¡Aunque el reenvío este en pausa el plan de suscripción sigue contando!\n\n💠 <b>Active el reenvío</b>:'
         user_id=str(sender.id)
+        user_dates[user_id]['resend_loop_old']=user_dates[user_id]['resend_loop']
         user_dates[user_id]['resend_loop']=0
+        await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')
+    
+    if event.data ==b'on_auto_resend':
+        if 'resend_loop_old' not in user_dates[user_id]:
+            info='⚠️No hay un tiempo previo configurado'
+            await event.respond(translate(info,lg),parse_mode='html')
+            return 0
+        user_dates[user_id]['resend_loop']=user_dates[user_id]['resend_loop_old']
+        keyboard = [Button.inline(translate('⚠️Pausar',lg), data=b'pause_auto_send')]
+        info='El reenvío de mensajes automáticos ha suido reanudado.Puede volver a pausarlo desde aqui</b>?\n\n• Nota:\n\n¡Luego de pausar el reenvío podrás reanudarlo desde aquí!\n\n⚠️ <b>Pause el reenvío</b>:'
+        await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html') 
         
     if event.data ==  b'edit_groups':
             print(user_dates)
@@ -1947,13 +2142,13 @@ async def callback_handler(event):
     if event.data ==  b'trial_plan':
         id_=str(sender.id)
 
-        info='🦎 Suscríbase para utilizar nuestros servicios gratis:\n\n• @Camario'
+        info='💠 Suscríbase para utilizar nuestros servicios gratis:\n\n👉 @Camario'
         keyboard_inline = [Button.inline(translate('☑️ Listo',lg), data=b'check_subscribed')]
         msg_trial_send=await event.respond(translate(info,lg),buttons=keyboard_inline,parse_mode='html')
         msg_trial_id=msg_trial_send.id
         user_dates[user_id]['check_sub_trial_id']=msg_trial_id
     if event.data == b'check_subscribed':
-        chanel_id=-1002023830162
+        chanel_id=-1002065562952
         us_id=int(sender.id)
         id_=str(sender.id)
         resp=await check_subscription(us_id,chanel_id)
@@ -1968,6 +2163,8 @@ async def callback_handler(event):
 
                     user_dates[str(sender.id)]['status']['cat']='trial' 
                     user_dates[str(sender.id)]['status']['lote']+=60*60*24*5
+                    if  user_dates[user_id]['status']['buyed']==0:
+                        user_dates[user_id]['status']['buyed']=time.time()
                     user_dates[str(sender.id)]['beginner_trial']=False
                     info='El plan de prueba vence en 5 dias'
                     msg=translate(info ,lg)
@@ -1980,7 +2177,7 @@ async def callback_handler(event):
                     
         else:
             
-            info='No estas subscrito,🦎 Suscríbase para utilizar nuestros servicios gratis:\n\n• @Camario'
+            info='No estas subscrito,💠 Suscríbase para utilizar nuestros servicios gratis:\n\n👉 @Camario'
             msg=translate(info ,lg)
             id_chat=sender.id
             id_msg= user_dates[user_id]['check_sub_trial_id']
@@ -2212,10 +2409,12 @@ def main_():
     
     loop1 = asyncio.new_event_loop()
     asyncio.set_event_loop(loop1)
-    try:
+    #try:
+    if True:
         
         loop1.run_until_complete(deposit_check())
-    except Exception as e:
+    #except Exception as e:
+    else:
         loop1.close()
         print(f"main exception1 :{e}")
         threading.Thread(target=main_).start()
