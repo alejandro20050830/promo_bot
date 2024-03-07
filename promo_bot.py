@@ -42,7 +42,7 @@ bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
 #bot_token = '5850221861:AAEg7MPNSUkK2nYm0YPCk2hBQzNmD_EAnds'
 test_mode=True
 on_saving=False
-txts=['🧩 Conectar Cuenta','💠 Conectar Canal','〽️ Agregar Grupos','⚙️ Configuración','👛 Suscripción','👁️ Remitente','⏳ Espera','🕖 Reenvío','✏️ Editar Grupos','🔰 Referidos','Siguiente ➡️','🔙 Volver','🔝 Menú principal','🧩 Más Cuentas','〽️ Más Canales','🔙 Volver','🔝 Menú principal','🚫 Cancel','🔖 Crear Mensaje','📮 Notificaciones','🔘 Pausar Reenvío','🖲️ Compartir Suscripción']
+txts=['🧩 Conectar Cuenta','💠 Conectar Canal','〽️ Agregar Grupos','⚙️ Configuración','👛 Suscripción','👁️ Remitente','⏳ Espera','🕖 Reenvío','✏️ Editar Grupos','🔰 Referidos','Siguiente ➡️','🔙 Volver','🔝 Menú principal','🧩 Más Cuentas','〽️ Más Canales','🔙 Volver','🔝 Menú principal','🚫 Cancelar','🔖 Crear Mensaje','📮 Notificaciones','🔘 Pausar Reenvío','🖲️ Compartir Suscripción']
 menu_system=[
     [[Button.text(txts[0],resize=True)],[Button.text(txts[1],resize=True),Button.text(txts[2],resize=True)],[Button.text(txts[3],resize=True)]],
     [[Button.text(txts[4],resize=True)],[Button.text(txts[5],resize=True),Button.text(txts[6],resize=True)],[Button.text(txts[7],resize=True),Button.text(txts[8],resize=True)],[Button.text(txts[9],resize=True),Button.text(txts[10],resize=True)],[Button.text(txts[11],resize=True),Button.text(txts[12],resize=True)]],      
@@ -85,7 +85,7 @@ async def get_custom_menu(event):
     sender = await event.get_sender()
 
     user_id=str(sender.id)
-    txts_=['🧩 Conectar Cuenta','💠 Conectar Canal','〽️ Agregar Grupos','⚙️ Configuración','👛 Suscripción','👁️ Remitente','⏳ Espera','🕖 Reenvío','✏️ Editar Grupos','🔰 Referidos','Siguiente ➡️','🔙 Volver','🔝 Menú principal','🧩 Más Cuentas','〽️ Más Canales','🔙 Volver','🔝 Menú principal','🚫 Cancel','🔖 Crear Mensaje','📮 Notificaciones','🔘 Pausar Reenvío','🖲️ Compartir Suscripción']
+    txts_=['🧩 Conectar Cuenta','💠 Conectar Canal','〽️ Agregar Grupos','⚙️ Configuración','👛 Suscripción','👁️ Remitente','⏳ Espera','🕖 Reenvío','✏️ Editar Grupos','🔰 Referidos','Siguiente ➡️','🔙 Volver','🔝 Menú principal','🧩 Más Cuentas','〽️ Más Canales','🔙 Volver','🔝 Menú principal','🚫 Cancelar','🔖 Crear Mensaje','📮 Notificaciones','🔘 Pausar Reenvío','🖲️ Compartir Suscripción']
     lg_id={'spanish':0,'russian':1,'english':2,'chinese (traditional)':3,'arabic':4}
     ind=0
     for t in txts_:
@@ -279,7 +279,7 @@ async def login_(event,password="not_set"):
         
     keyboard = await get_custom_menu(event)
     keyboard=keyboard[0]
-    info="🐾 ¡Conexión Establecida con Éxito!\n\n🤜🤛 Gracias por elegir @Camariobot, ahora todos nuestros servicios están disponibles para usted!\n\n👣 Para comenzar a configurar su primera tarea de reenvío siga los siguientes pasos:\n \n#Paso1 - Debes agregar un canal el cual se utilizará para reenviar todas la publiciones a todos sus grupos agregados.\n\n• <b>/AgregarCanal</b><b>\n\n</b>#Paso2 - Es tan simple que solamente te falta agregar las ID de los grupos a los cuales se reenviarán los mensajes recibidos en el canal previamente configurado.\n\n• <b>/AgregarGrupos</b><b>\n\n</b>⚙️ Para cualquier consulta, no dude en contactar con @CamarioAdmin\n\n🦎 Manténgase Informado con las últimas actualizaciones @Camario"
+    info="🐾 ¡Conexión Establecida con Éxito!\n\n🤜🤛 Gracias por elegir @Camariobot, ahora todos nuestros servicios están disponibles para usted!\n\n👣 Para comenzar a configurar su primera tarea de reenvío siga los siguientes pasos:\n \n#Paso1 - Debes agregar un canal el cual se utilizará para reenviar todas la publiciones a todos sus grupos agregados.\n\n• <b>/AgregarCanal</b><b>\n\n</b>#Paso2 - Es tan simple que solamente te falta agregar las ID de los grupos a los cuales se reenviarán los mensajes recibidos en el canal previamente configurado.\n\n• <b>/AddGroups</b><b>\n\n</b>⚙️ Para cualquier consulta, no dude en contactar con @CamarioAdmin\n\n🦎 Manténgase Informado con las últimas actualizaciones @Camario"
     await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html')
     await user.disconnect()
     return 0
@@ -464,12 +464,16 @@ async def deposit_solicity(event,amount):
 '''
                         
     #else:
-        
+    months=1
+    if amount==9:
+        months+=1
+    if amount==12:
+        months+=1  
     create_dates=crear_factura(amount,test_mode)
     id=create_dates['invoice_id']
     pay_url=create_dates['bot_invoice_url']
     user_dates[user_id]['invoice_id']=id
-    await event.respond(translate(f'Realizar pago de: {amount} USD ',lg), buttons=[(Button.url(translate('🦎 Pagar Factura',lg), pay_url))],parse_mode='html')
+    await event.respond(translate(f'🔖 ¡<b>Factura de pago</b>!\n\n• Tipo - Crypto\n• Pago - {amount} USD\n• Tiempo - {months} Mes\n• Suscripción - Premium',lg), buttons=[(Button.url(translate('👛 Pagar Factura',lg), pay_url))],parse_mode='html')
     await upload_db() 
     
 
@@ -671,12 +675,12 @@ async def start(event,beginner=False):
             keyboard = [[Button.text(translate('🧩 Conectar Cuenta',user_dates[str(sender.id)]['leng']),resize=True)],[Button.text(translate('💠 Conectar Canal',user_dates[str(sender.id)]['leng']),resize=True),Button.text(translate('〽️ Agregar Grupos',user_dates[str(sender.id)]['leng']),resize=True)],[Button.text(translate('⚙️ Configuración',user_dates[str(sender.id)]['leng']),resize=True)]]
             if beginner:
                 
-                keyboard_inline = [Button.inline(translate('🎉 Pagar',user_dates[str(sender.id)]['leng']), data=b'trial_plan'),Button.inline(translate('👛 Pagar',user_dates[str(sender.id)]['leng']), data=b'buy_premium1')]
+                keyboard_inline = [Button.inline(translate('👛 Pagar',user_dates[str(sender.id)]['leng']), data=b'buy_premium1'),Button.inline(translate('🎉 Pagar',user_dates[str(sender.id)]['leng']), data=b'trial_plan')]
                 #await event.respond(translate('💠 El precio para utilizar los servicios de @Camariobot es de:\n\n5 USD ✖️ 1 Mes 👛\n\nPrueba Gratis ✖️ 5 Días 🎉',user_dates[str(sender.id)]['leng']), buttons=keyboard_inline,parse_mode='html')
-                await event.respond(translate('🤜🤛 Gracias por elegir @Camariobot!\n\n👣 Para comenzar a configurar su cuenta siga los siguientes pasos:\n\n#Paso1 - El primero de 3 simplemente pasos a seguir será conectar su cuenta de Telegram con nuestro bot!\n\n• /ConectarCuenta\n\n#Paso2 - Debes agregar un canal el cual se utilizará para reenviar todas la publicaciones a todos los grupos agregados!\n\n• /AgregarCanal\n\n#Paso3 - Es tan simple que solamente te falta agregar las ID de los grupos a los cuales se reenviarán los mensajes recibidos en el canal previamente configurado!\n\n• /AgregarGrupos',user_dates[str(sender.id)]['leng']), buttons=keyboard,parse_mode='html')
+                await event.respond(translate('🤜🤛 Gracias por elegir @Camariobot!\n\n👣 Para comenzar a configurar su cuenta siga los siguientes pasos:\n\n#Paso1 - El primero de 3 simplemente pasos a seguir será conectar su cuenta de Telegram con nuestro bot!\n\n• /ConectarCuenta\n\n#Paso2 - Debes agregar un canal el cual se utilizará para reenviar todas la publicaciones a todos los grupos agregados!\n\n• /AgregarCanal\n\n#Paso3 - Es tan simple que solamente te falta agregar las ID de los grupos a los cuales se reenviarán los mensajes recibidos en el canal previamente configurado!\n\n• /AddGroups',user_dates[str(sender.id)]['leng']), buttons=keyboard,parse_mode='html')
             else:
                 await event.respond(translate('Bienvenido',user_dates[str(sender.id)]['leng']), buttons=keyboard,parse_mode='html')
-    #keyboard_inline = [Button.inline(translate('🎉 Pagar',user_dates[str(sender.id)]['leng']), data=b'trial_plan'),Button.inline(translate('👛 Pagar',user_dates[str(sender.id)]['leng']), data=b'buy_premium1')]     
+    #keyboard_inline = [Button.inline(translate('👛 Pagar',user_dates[str(sender.id)]['leng']), data=b'buy_premium1'),Button.inline(translate('🎉 Pagar',user_dates[str(sender.id)]['leng']), data=b'trial_plan')]     
     #await event.respond("a",buttons=keyboard_inline)
             
     #await event.respond('• Manténgase Actualizado:', buttons=[(Button.url('🦎 Camario', 'http://t.me/Camario'))],parse_mode='html')
@@ -1200,6 +1204,7 @@ async def handle_channels_new_message(event):
         
 
 async def send_anounce(event):
+            
             global user_dates
             chat_id = event.chat_id
             sender = await event.get_sender()
@@ -1232,6 +1237,7 @@ async def send_anounce(event):
                 timestamp=time.time()
                 #date_in={timestamp:msg,'event':event.message}
                 date_in={'time':timestamp,'msg':msg,'event':'not_remitent'}
+                #date_in={'time':timestamp,'msg':msg,'event':event.message}
                 global state
                 state=False
                 await asyncio.sleep(3)
@@ -1239,9 +1245,7 @@ async def send_anounce(event):
                 await upload_db()
                 await asyncio.sleep(1)
                 state=True
-            
-                
-                
+
                 #for group_id in group_ids[user_id]:
                     
                 #    try:
@@ -1296,14 +1300,19 @@ async def handler(event):
         
         #user = TelegramClient(str(sender.id), api_id, api_hash)
         #await user.connect()
-        if message in traduct_menu["👛 Suscripción"] or message=='/Suscripcion':
-                keyboard = [[Button.inline(translate('1 Mes - $5',lg), data=b'buy_premium1')],[Button.inline(translate('2 Meses - $9',lg), data=b'buy_premium2'),Button.inline(translate('3 Meses - $12',lg), data=b'buy_premium3')]] 
+        if message in traduct_menu["👛 Suscripción"] or message=='/pay':
+                keyboard = [[Button.inline(translate('1 Month - $5',lg), data=b'buy_premium1')],[Button.inline(translate('2 Meses - $9',lg), data=b'buy_premium2'),Button.inline(translate('3 Meses - $12',lg), data=b'buy_premium3')]] 
                 info="👛 Elige un período de suscripción:"
                 await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')  
                 return 0
-        if user_dates[user_id]['status']['cat']!='basic' or user_id in admins or user_dates[user_id]['beginner']: 
+            
+        all_public_option=False
+        if message in traduct_menu['🧩 Conectar Cuenta'] or message=='/ConectarCuenta' or  message in traduct_menu['🚫 Cancelar'] or message in traduct_menu['〽️ Agregar Grupos'] or message=='/AddGroups' or message in traduct_menu['🕖 Reenvío'] or  message in traduct_menu['🔰 Referidos'] or message=='/reff':
+            all_public_option=True
+              
+        if user_dates[user_id]['status']['cat']!='basic' or user_id in admins or user_dates[user_id]['beginner'] or all_public_option: 
             if user_dates[user_id]['beginner']:
-                keyboard_inline = [Button.inline(translate('🎉 Pagar',user_dates[str(sender.id)]['leng']), data=b'trial_plan'),Button.inline(translate('👛 Pagar',user_dates[str(sender.id)]['leng']), data=b'buy_premium1')]
+                keyboard_inline = [Button.inline(translate('👛 Pagar',user_dates[str(sender.id)]['leng']), data=b'buy_premium1'),Button.inline(translate('🎉 Pagar',user_dates[str(sender.id)]['leng']), data=b'trial_plan')]
                
                 await event.respond(translate('#💠 El precio para utilizar los servicios de @Camariobot es de:\n\n5 USD ✖️ 1 Mes 👛\n\nPrueba Gratis ✖️ 5 Días 🎉',user_dates[str(sender.id)]['leng']), buttons=keyboard_inline,parse_mode='html')
                 return 0
@@ -1336,16 +1345,16 @@ async def handler(event):
                 await user.disconnect()
         
 
-            elif message in traduct_menu['🚫 Cancel']:
+            elif message in traduct_menu['🚫 Cancelar']:
                 keyboard = await menu_action('cancel',event)
                 await event.respond(translate('🚫 Cancel',lg),buttons=keyboard)
-            
+                user_dates[user_id]['historial']=[]
             elif message in traduct_menu['💠 Conectar Canal'] or message=='/AgregarCanal':
                 keyboard = [Button.inline(translate('💠 Conectar Canal Conectar Canal' ,lg),data=b'add_channel')]
                 info='💠 <b>Utilice esto para forjar una conexión entre su canal y </b>@CamarioBot.\n\n• Una conexión con al menos un canal es esencial para utilizar los servicios de reenvío automático.\n\n🤖 <b>@Camariobot</b><b> deberá ser añadido como administrador en el canal configurado</b>!\n\n• Si no añade @Camariobot los servicios no funcionarán con normalidad.\n\n💡 <b>Parámetros de Conexión</b>:\n\n<code>/channel</code> (ID del Canal)\n\n• <b>Ejemplo</b>:\n\n/channel 1002065562952\n\n🔍 <b>Localice el ID de su canal utilizando </b>@ScanIDBot.\n\n• ¿No estás seguro de cómo proceder?Contacte con <a href="http://t.me/CamarioAdmin">Soporte</a>.\n\n💠 <b>Conecte</b> <b>un Canal</b>:'
                 await event.respond(translate(info ,lg) ,buttons=keyboard,parse_mode='html',link_preview=False)
                 
-            elif message in traduct_menu['〽️ Agregar Grupos'] or message=='/AgregarGrupos':  
+            elif message in traduct_menu['〽️ Agregar Grupos'] or message=='/AddGroups':  
                 keyboard = [[Button.inline(translate('〽️ Agregar Grupos' ,lg),data=b'add_group')]]
                 info='〽️ ¡<b>Agrega el ID de los grupos a los cuales se reenviarán las publicaciones</b>!\n\n• Deberá ser miembro de todos los grupos agregados.\n\n• No existe un límite de grupos para reenviar publicaciones.\n\n• Para editar, eliminar o agregar nuevos grupos debera dirigirse ha "⚙️Configuración".\n\n💡 <b>Parámetros de Conexión</b>:\n\n/id (ID de los grupos, separe con un espacio cada ID)\n\n• <b>Ejemplo</b>:\n\n/id 1001256118443 1001484740111\n\n• ¿No estás seguro de cómo proceder? Contacte con <a href="http://t.me/CamarioAdmin">Soporte</a>.\n\n〽️ <b>Agregue los Grupos</b>:'
                 await event.respond(translate(info ,lg),buttons=keyboard,parse_mode='html',link_preview=False)
@@ -1398,7 +1407,7 @@ async def handler(event):
                 info=f'⏳ <b>Espera PreEnvío</b>.\n\n• Tiempo: {wait_time} Segundos \n\n💡 <b>La espera previa al reenvío te permite establecer un retraso entre el envío de la publicación en el canal y el reenvío en los grupos</b>.\n\n• Dentro de esos segundos puedes editar el mensaje o eliminarlo antes de que se reenvié.\n\n• Tenga en cuenta que el tiempo de espera transcurre solo entre la recepción y el reenvío de ese único mensaje.'
                 await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html')
             
-            elif message==traduct_menu['🕖 Reenvío']:
+            elif message in traduct_menu['🕖 Reenvío']:
                 if sender.id not in menu_history:
                     menu_history[sender.id]=[message]
                 else:
@@ -1432,10 +1441,13 @@ async def handler(event):
                 info=f'〽️ <b>Actualmente los grupos agregados son</b>:\n\n{groups}\n✏️ <b>Edita</b>, <b>agrega o elimina grupos desde el botón</b>:'
                 await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html')   
                 
-            elif message in traduct_menu['🔰 Referidos']:
-                keyboard = [Button.inline(translate('♻️ Generar Enlace',lg), data=b'generate_ref_link')]
+            elif message in traduct_menu['🔰 Referidos'] or message=='/reff':
+                keyboard = [Button.inline(translate('🔗 Generar Enlace',lg), data=b'generate_ref_link')]
                 info=f'🔰 ¡Gane el 25% de los fondos aumentados por sus referidos!\n\n• <b>Referidos</b> - {len(tree_ref(str(sender.id))[0])}\n\n• <b>Comisiones</b> - {str(tree_ref(str(sender.id))[1])} USD\n\n👛 Los Referidos existen para brindarle la oportunidad de adquirir suscripciónes de pago gratis!'
-                await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html')  
+                msg_ref_send=await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html')  
+              
+                msg_ref_id=msg_ref_send.id
+                user_dates[user_id]['ref_url_id']=msg_ref_id
             
             elif message in traduct_menu['Siguiente ➡️']:
                 keyboard = await get_custom_menu(event)
@@ -1488,7 +1500,7 @@ async def handler(event):
                         
             elif message in traduct_menu['🔘 Pausar Reenvío']:
                 
-                keyboard = [Button.inline(translate('⚠️Pausar',lg), data=b'pause_auto_send')]
+                keyboard = [Button.inline(translate('⚠️ Pausar Reenvío',lg), data=b'pause_auto_send')]
                 info='‼️ ¿<b>Estás seguro de pausar el reenvío de mensajes automáticos</b>?\n\n• Nota:\n\n¡Luego de pausar el reenvío podrás reanudarlo desde aquí!\n\n⚠️ <b>Pause el reenvío</b>:'
                 await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html') 
             
@@ -1521,6 +1533,12 @@ async def handler(event):
                 if respond!=0:
                     info='Error'
                     await event.respond(translate(info,lg),parse_mode='html') 
+            
+            elif message=='/help':
+                info='📨 Estás presentando problemas, tienes dudas, sugerencias, contáctenos de inmediato:'
+                buttons=[[Button.url(translate('🔖 Support',lg),'https://t.me/CamarioAdmin')],[Button.url(translate('💠 Channel',lg),'https://t.me/Camario')],[Button.url(translate('💭 Group',lg),'https://t.me/CamarioChat')]]
+               
+                await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html') 
             
             elif len(user_dates[user_id]['historial'])>0:
                 print('added')
@@ -1588,9 +1606,10 @@ async def callback_handler(event):
             
     lg=user_dates[user_id]['leng']
     
-    
-
-    if user_dates[user_id]['status']['cat']=='basic' and user_id not in admins and not user_dates[str(sender.id)]['beginner'] and not  user_dates[str(sender.id)]['beginner_trial']:
+    all_public_option=False
+    if event.data == b'buy_premium1' or event.data == b'buy_premium2' or b'buy_premium3' or event.data == b'check_subscribed' or event.data ==  b'trial_plan' or event.data == b'yes_auto_send_ref_link' or event.data == b'auto_send_ref_link' or event.data == b'generate_ref_link' or b'more_time' or event.data == b'connect': 
+        all_public_option=True
+    if (user_dates[user_id]['status']['cat']=='basic' and user_id not in admins and not user_dates[str(sender.id)]['beginner'] and not  user_dates[str(sender.id)]['beginner_trial']) or all_public_option :
         keyboard = await get_custom_menu(event)
         keyboard=keyboard[1]
         if event.data == b'buy_premium1':
@@ -1695,7 +1714,7 @@ async def callback_handler(event):
         return 0
     # Aquí puedes agregar el código que quieras ejecutar cuando se presione el botón
     if user_dates[user_id]['beginner']:
-                keyboard_inline = [Button.inline(translate('🎉 Pagar',user_dates[str(sender.id)]['leng']), data=b'trial_plan'),Button.inline(translate('👛 Pagar',user_dates[str(sender.id)]['leng']), data=b'buy_premium1')]
+                keyboard_inline = [Button.inline(translate('👛 Pagar',user_dates[str(sender.id)]['leng']), data=b'buy_premium1'),Button.inline(translate('🎉 Pagar',user_dates[str(sender.id)]['leng']), data=b'trial_plan')]
                 if event.data ==  b'lg_ru':
 
                     user_id=str(sender.id)
@@ -1779,13 +1798,16 @@ async def callback_handler(event):
         await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')
     
     if event.data == b'generate_ref_link':
-
-        
-        keyboard = [Button.inline(translate('🧩 Reenvio automatico',lg), data=b'auto_send_ref_link')]
-        info=f'https://t.me/Camariobot?start={sender.id}'
-        await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')
+        id_chat=sender.id
+        id_msg=user_dates[user_id]['ref_url_id']
+        keyboard = [Button.inline(translate(' ♻️ Reenvio automatico',lg), data=b'auto_send_ref_link')]
+        msg=f'https://t.me/Camariobot?start={sender.id}'
+        #await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')
+        await bot.edit_message(id_chat,id_msg,translate(msg,lg),buttons=keyboard,parse_mode='html')
         
     if event.data == b'auto_send_ref_link':
+        id_chat=sender.id
+        id_msg=user_dates[user_id]['ref_url_id']
         user_id=str(sender.id)
         if user_id not in user_dates:
             
@@ -1796,13 +1818,15 @@ async def callback_handler(event):
 
         
         sleep_time=user_dates[user_id]['resend_loop']
-        keyboard = [Button.inline(translate('🧩 Continuar',lg), data=b'yes_auto_send_ref_link'),Button.inline(translate('🚫 Cancelar',lg), data=b'can_auto_send_ref_link')]
-        info=f'🧩 Reenviaras tu enlace a todos los grupos con un intervalo de reenvío de {str(sleep_time/60)} Minutos.\n\n• Está acción es gratis\n\n⁉️ Deseas continuar con el reenvío:'
-        await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')
+        keyboard = [Button.inline(translate('♻️ Continuar',lg), data=b'yes_auto_send_ref_link'),Button.inline(translate('🚫 Cancelar',lg), data=b'can_auto_send_ref_link')]
+        msg=f'♻️ Reenviaras tu enlace a todos los grupos con un intervalo de reenvío de {str(sleep_time/60)} Minutos.\n\n• Está acción es gratis\n\n⁉️ Deseas continuar con el reenvío:'
+        #await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')
+        await bot.edit_message(id_chat,id_msg,translate(msg,lg),buttons=keyboard,parse_mode='html')
     if event.data == b'yes_auto_send_ref_link':
-        keyboard = [Button.inline(translate('🧩 Continuar',lg), data=b'cont_auto_send_ref_link'),Button.inline(translate('🚫 Cancelar',lg), data=b'can_auto_send_ref_link')]
+        keyboard = [Button.inline(translate('♻️ Continuar',lg), data=b'cont_auto_send_ref_link'),Button.inline(translate('🚫 Cancelar',lg), data=b'can_auto_send_ref_link')]
         user_id=str(sender.id)
-
+        id_chat=sender.id
+        id_msg=user_dates[user_id]['ref_url_id']
         if user_id not in user_dates:
             
             user_dates[user_id]={}
@@ -1813,13 +1837,15 @@ async def callback_handler(event):
             
 
             
-        if 'group_ids' in  user_dates[user_id]:
-            info='🔎 Necesitas agregar grupos para reenviar automáticamente su enlace a ellos!\n\n• /AgregarGrupos'
-            await event.respond(translate(info,lg),parse_mode='html') 
+        if 'group_ids' not in  user_dates[user_id]:
+            info='🔎 Necesitas agregar grupos para reenviar automáticamente su enlace a ellos!\n\n• /AddGroups'
+            #await event.respond(translate(info,lg),parse_mode='html') 
+            await bot.edit_message(id_chat,id_msg,translate(info,lg),parse_mode='html')
         else:
             if len(user_dates[user_id]['group_ids'])==0:
-                info='🔎 Necesitas agregar grupos para reenviar automáticamente su enlace a ellos!\n\n• /AgregarGrupos'
-                await event.respond(translate(info,lg),parse_mode='html') 
+                info='🔎 Necesitas agregar grupos para reenviar automáticamente su enlace a ellos!\n\n• /AddGroups'
+                #await event.respond(translate(info,lg),parse_mode='html') 
+                await bot.edit_message(id_chat,id_msg,translate(info,lg),parse_mode='html')
             else:
                 timestamp=time.time()
                 #date_in={timestamp:msg,'event':event.message}
@@ -1985,9 +2011,9 @@ async def callback_handler(event):
                     user_dates[str(sender.id)]['notifications']=True
         
         user_dates[str(sender.id)]['notifications']=True      
-        state='🌑Apagar'
+        state='Apagar'
         if user_dates[str(sender.id)]['notifications']:
-            state='🟢Encender'
+            state='Encender'
         keyboard = [Button.inline(translate('🟢Encender',lg), data=b'on_notif'),Button.inline(translate('🌑Apagar',lg), data=b'off_notif')]
         msg=f'📮 ¿<b>Deseas dejar de resivir notificaciones</b>?\n\n• Nota:\n\nSi dejas de recibir notificaciones no sabrás si su cuenta o el reenvío automático deja de funcionar por algún motivo.\n\n🔘 <b>Actualmente</b> - {state}'
             
@@ -2007,9 +2033,9 @@ async def callback_handler(event):
                     user_dates[str(sender.id)]['notifications']=True
         
         user_dates[str(sender.id)]['notifications']=False     
-        state='🌑Apagar'
+        state='Apagar'
         if user_dates[str(sender.id)]['notifications']:
-            state='🟢Encender'
+            state='Encender'
         keyboard = [Button.inline(translate('🟢Encender',lg), data=b'on_notif'),Button.inline(translate('🌑Apagar',lg), data=b'off_notif')]
         msg=f'📮 ¿<b>Deseas dejar de resivir notificaciones</b>?\n\n• Nota:\n\nSi dejas de recibir notificaciones no sabrás si su cuenta o el reenvío automático deja de funcionar por algún motivo.\n\n🔘 <b>Actualmente</b> - {state}'
             
@@ -2177,11 +2203,11 @@ async def callback_handler(event):
                     
         else:
             
-            info='No estas subscrito,💠 Suscríbase para utilizar nuestros servicios gratis:\n\n👉 @Camario'
+            info='⚠️ Suscríbase para utilizar nuestros servicios gratis:\n\n👉 @Camario'
             msg=translate(info ,lg)
             id_chat=sender.id
             id_msg= user_dates[user_id]['check_sub_trial_id']
-            keyboard_inline = [Button.inline(translate('☑️ Listo',lg), data=b'check_subscribed')]
+            keyboard_inline = [Button.inline(translate('✔️ Listo',lg), data=b'check_subscribed')]
             await bot.edit_message(id_chat,id_msg,msg,buttons=keyboard_inline,parse_mode='html')
 
             
