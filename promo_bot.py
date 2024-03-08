@@ -1,3 +1,4 @@
+import os
 from telethon import TelegramClient, events
 from telethon.tl import functions, types
 from telethon import events, Button
@@ -1307,7 +1308,7 @@ async def handler(event):
                 return 0
             
         all_public_option=False
-        if message in traduct_menu['🧩 Conectar Cuenta'] or message=='/ConectarCuenta' or  message in traduct_menu['🚫 Cancelar'] or message in traduct_menu['〽️ Agregar Grupos'] or message=='/AddGroups' or message in traduct_menu['🕖 Reenvío'] or  message in traduct_menu['🔰 Referidos'] or message=='/reff':
+        if message in traduct_menu['🧩 Conectar Cuenta'] or message=='/ConectarCuenta' or  message in traduct_menu['🚫 Cancelar'] or message in traduct_menu['〽️ Agregar Grupos'] or message=='/AddGroups' or message in traduct_menu['🕖 Reenvío'] or  message in traduct_menu['🔰 Referidos'] or message=='/reff' or 'mycode' in message or 'mypass' in message or  message in traduct_menu['🔙 Volver'] or  message in traduct_menu['🔝 Menú principal']:
             all_public_option=True
               
         if user_dates[user_id]['status']['cat']!='basic' or user_id in admins or user_dates[user_id]['beginner'] or all_public_option: 
@@ -1350,7 +1351,7 @@ async def handler(event):
                 await event.respond(translate('🚫 Cancel',lg),buttons=keyboard)
                 user_dates[user_id]['historial']=[]
             elif message in traduct_menu['💠 Conectar Canal'] or message=='/AgregarCanal':
-                keyboard = [Button.inline(translate('💠 Conectar Canal Conectar Canal' ,lg),data=b'add_channel')]
+                keyboard = [Button.inline(translate('💠 Conectar Canal' ,lg),data=b'add_channel')]
                 info='💠 <b>Utilice esto para forjar una conexión entre su canal y </b>@CamarioBot.\n\n• Una conexión con al menos un canal es esencial para utilizar los servicios de reenvío automático.\n\n🤖 <b>@Camariobot</b><b> deberá ser añadido como administrador en el canal configurado</b>!\n\n• Si no añade @Camariobot los servicios no funcionarán con normalidad.\n\n💡 <b>Parámetros de Conexión</b>:\n\n<code>/channel</code> (ID del Canal)\n\n• <b>Ejemplo</b>:\n\n/channel 1002065562952\n\n🔍 <b>Localice el ID de su canal utilizando </b>@ScanIDBot.\n\n• ¿No estás seguro de cómo proceder?Contacte con <a href="http://t.me/CamarioAdmin">Soporte</a>.\n\n💠 <b>Conecte</b> <b>un Canal</b>:'
                 await event.respond(translate(info ,lg) ,buttons=keyboard,parse_mode='html',link_preview=False)
                 
@@ -1536,10 +1537,24 @@ async def handler(event):
             
             elif message=='/help':
                 info='📨 Estás presentando problemas, tienes dudas, sugerencias, contáctenos de inmediato:'
-                buttons=[[Button.url(translate('🔖 Support',lg),'https://t.me/CamarioAdmin')],[Button.url(translate('💠 Channel',lg),'https://t.me/Camario')],[Button.url(translate('💭 Group',lg),'https://t.me/CamarioChat')]]
-               
+                keyboard=[[Button.url(translate('🔖 Support',lg),'https://t.me/CamarioAdmin')],[Button.url(translate('💠 Channel',lg),'https://t.me/Camario')],[Button.url(translate('💭 Group',lg),'https://t.me/CamarioChat')]]
+
                 await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html') 
             
+            elif message=='/close':
+                
+                keyboard=await get_custom_menu(event)
+                keyboard=keyboard[0]
+                
+                    
+                keyboard_inline=[Button.inline(translate('🔘 Desconectar',lg), data=b'close_session'),Button.inline(translate(' 🚫 Cancelar',lg), data=b'cancel_session')]
+                info='⁉️ ¿Estás seguro de que deseas desconectar tu cuenta?\n\n• Ten en cuenta que perderás todos los datos.'
+
+                msg_send=await event.respond(translate(info,lg), buttons=keyboard_inline,parse_mode='html') 
+                msg_id=msg_send.id
+                user_dates[str(sender.id)]['close_msg_id']=msg_id
+                await upload_db()
+
             elif len(user_dates[user_id]['historial'])>0:
                 print('added')
                 if  user_dates[user_id]['historial'][0]=='🔖 Crear Mensaje':
@@ -1552,9 +1567,9 @@ async def handler(event):
         else:
             keyboard = await get_custom_menu(event)
             keyboard=keyboard[1]
-
-            info="Su plan ha concluido por favor compre uno para poder seguir utilizando el bot.\nDirijase a la seccion 👛 Suscripción o presione el comando /Suscripcion para realizar la compra "
-            await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')  
+            keyboard_inline = [Button.inline(translate('👛 Pagar',user_dates[str(sender.id)]['leng']), data=b'buy_premium1')]
+            info='💠 El precio para utilizar los servicios de @Camariobot es de:\n\n5 USD ✖️ 1 Mes 👛'
+            await event.respond(translate(info,lg),buttons=keyboard_inline,parse_mode='html')  
                 
             
 #Controlador de menu 
@@ -1609,7 +1624,7 @@ async def callback_handler(event):
     all_public_option=False
     if event.data == b'buy_premium1' or event.data == b'buy_premium2' or b'buy_premium3' or event.data == b'check_subscribed' or event.data ==  b'trial_plan' or event.data == b'yes_auto_send_ref_link' or event.data == b'auto_send_ref_link' or event.data == b'generate_ref_link' or b'more_time' or event.data == b'connect': 
         all_public_option=True
-    if (user_dates[user_id]['status']['cat']=='basic' and user_id not in admins and not user_dates[str(sender.id)]['beginner'] and not  user_dates[str(sender.id)]['beginner_trial']) or all_public_option :
+    if (user_dates[user_id]['status']['cat']=='basic' and user_id not in admins and not user_dates[str(sender.id)]['beginner'] and not  user_dates[str(sender.id)]['beginner_trial']) :
         keyboard = await get_custom_menu(event)
         keyboard=keyboard[1]
         if event.data == b'buy_premium1':
@@ -1708,8 +1723,9 @@ async def callback_handler(event):
                 await bot.send_message(int(user_id), translate(msg,lg),parse_mode='html')
                 await upload_db()
             return 0 
-        info="Su plan ha concluido por favor compre uno para poder seguir utilizando el bot.\nDirijase a la seccion 👛 Suscripción o presione el comando /Suscripcion para realizar la compra "
-        await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')  
+        keyboard_inline = [Button.inline(translate('👛 Pagar',user_dates[str(sender.id)]['leng']), data=b'buy_premium1')]
+        info='💠 El precio para utilizar los servicios de @Camariobot es de:\n\n5 USD ✖️ 1 Mes 👛'
+        await event.respond(translate(info,lg),buttons=keyboard_inline,parse_mode='html')  
         
         return 0
     # Aquí puedes agregar el código que quieras ejecutar cuando se presione el botón
@@ -2164,7 +2180,42 @@ async def callback_handler(event):
             await start(event,beginner=True)
         else:
             await start(event)
+    if event.data==b'cancel_session':
+        msg=f'Cancelado' 
+        id_chat=sender.id
+        id_msg= user_dates[str(sender.id)]['close_msg_id']
     
+        await bot.edit_message(id_chat, id_msg,translate(msg,lg),parse_mode='html')
+    if event.data==b'close_session': 
+                user_id=str(sender.id)
+                file=f'{user_id}.session'
+                keyboard=await get_custom_menu(event)
+                keyboard=keyboard[0]
+                if os.path.exists(file):
+                    os.remove(file)
+                    print("El archivo ha sido eliminado.")
+               
+                  
+                    user_dates[user_id]['group_ids']=[]
+                    user_dates[user_id]['pending_messages']=[]
+                    user_dates[user_id]['sleep_time']=1
+                    user_dates[user_id]['wait_time']=1
+                    user_dates[user_id]['notifications']=True
+                    user_dates[user_id]['resend_loop']=0
+                    user_dates[user_id]['channel_ids']=[]
+                    msg='‼️ ¡Cuenta Desconecta!\n\n• Precine el siguiente botón para reconectar su cuenta:'
+                    id_chat=sender.id
+                    id_msg= user_dates[str(sender.id)]['close_msg_id']
+                    keyboard = [Button.inline(translate('🧩 Conectar Cuenta',lg), data=b'connect')]
+                    await bot.edit_message(id_chat, id_msg,translate(msg,lg),buttons=keyboard,parse_mode='html')
+                    await upload_db()
+                else:
+                    print("El archivo no existe.")
+                    msg='No posee cuenta conectada' 
+                    id_chat=sender.id
+                    id_msg= user_dates[str(sender.id)]['close_msg_id']
+    
+                    await bot.edit_message(id_chat, id_msg,translate(msg,lg),buttons=keyboard,parse_mode='html')
     if event.data ==  b'trial_plan':
         id_=str(sender.id)
 
