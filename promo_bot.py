@@ -1729,7 +1729,7 @@ async def callback_handler(event):
         
         return 0
     # Aquí puedes agregar el código que quieras ejecutar cuando se presione el botón
-    if user_dates[user_id]['beginner']:
+    if user_dates[user_id]['beginner'] and  event.data !=  b'trial_plan' and event.data != b'check_subscribed' :
                 keyboard_inline = [Button.inline(translate('👛 Pagar',user_dates[str(sender.id)]['leng']), data=b'buy_premium1'),Button.inline(translate('🎉 Pagar',user_dates[str(sender.id)]['leng']), data=b'trial_plan')]
                 if event.data ==  b'lg_ru':
 
