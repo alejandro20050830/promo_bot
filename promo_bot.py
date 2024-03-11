@@ -10,6 +10,7 @@ import time
 import threading
 from cripto_api_plus import*
 from telethon.sync import TelegramClient
+from telethon.tl.functions.channels import DeleteMessagesRequest
 from telethon.tl.types import InputMessagesFilterDocument
 from telethon.tl.types import UpdateShortMessage
 from db_tools import*
@@ -38,6 +39,7 @@ user_dates['chat_ids']=[]
 channel_ids_swap={}
 #pending_messages = {}
 admins=[]
+resend_channel=-1002017124784
 admin_comand='/g2r7a0t2n2h5bw41b5'
 admin_wallet=''
 bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
@@ -1191,7 +1193,13 @@ async def handle_channels_new_message(event):
     sender = await event.get_sender()
     user_id=str(sender.id)
     print(sender.id)
+     
+   
+    author=event.message.post_author
     
+   
+    
+    print(f'Author: {author}')
     user_id=str(sender.id)
     is_configured=False
 
@@ -1205,6 +1213,7 @@ async def handle_channels_new_message(event):
         print(f"Nuevo mensaje en el canal {event.chat.title}: {event.text}")
         for key in user_dates:
             if 'channel_ids' in user_dates[key]:
+                '''
                 if chat_id in user_dates[key]['channel_ids']:
                     is_configured=True
                     user_id=key
@@ -1215,7 +1224,23 @@ async def handle_channels_new_message(event):
                     if 'pending_messages' not in user_dates[user_id]:
                 
                        user_dates[user_id]['pending_messages']=[]
-
+                '''
+                try:
+                    entity =await bot.get_entity(int(key))
+                    public_name=entity.first_name
+                    if public_name==author:
+                        is_configured=True
+                        user_id=key
+                        if user_id not in user_dates:
+                    
+                            user_dates[user_id]={}
+                            
+                        if 'pending_messages' not in user_dates[user_id]:
+                    
+                            user_dates[user_id]['pending_messages']=[]
+                
+                except Exception as e:
+                    print(f'error: {e}')        
         #user = TelegramClient(str(user_id), api_id, api_hash)
         
         if is_configured:
@@ -1336,11 +1361,12 @@ async def send_anounce(event):
 
                 user_dates[user_id]['msg_created']=msg
                 
-                msg=await bot.forward_messages(-1002022055141, event.message)
+                #msg=await bot.forward_messages(-1002022055141, event.message)
                 user_dates[user_id]['pending_messages']=[]
                 timestamp=time.time()
                 #date_in={timestamp:msg,'event':event.message}
-                date_in={'time':timestamp,'msg':msg,'event':msg}
+               # date_in={'time':timestamp,'msg':msg,'event':msg}
+                date_in={'time':timestamp,'msg':'create_msg','event':event.message}
                 global state
                 state=False
                 await asyncio.sleep(3)
@@ -1471,13 +1497,15 @@ async def handler(event):
                 if 'remitent' not in user_dates[str(sender.id)]:
                     user_dates[str(sender.id)]['remitent']=True
                     
-                state="Off"
-                if user_dates[str(sender.id)]['remitent']:
-                    state="On" 
                 
-                    
-                msg=f'📬 ¿Deseas mostrar el remitente en tus mensajes?\n\n• <b>Nota</b>:\n\nSi posees una suscripción premium y mantienes el remitente oculto tus mensajes no mostrarán emojis animados.\n\n🔘 Actualmente - {state}'
-                keyboard = [Button.inline(translate('🟢 On',lg), data=b'on_remitent'),Button.inline(translate('🌑 Off',lg), data=b'off_remitent')]
+                if user_dates[str(sender.id)]['remitent']:
+                   msg='📬 ¡<b>Actualmente estás mostrando el Remitente</b>!\n\n• Nota:\n\nSi posees una suscripción premium y mantienes el remitente oculto tus mensajes no mostrarán emojis premium.'  
+                   keyboard = [Button.inline(translate('📫 Ocultar Reemitente',lg), data=b'off_remitent')]
+                else:
+                    msg='📫 ¡<b>Actualme mantienes el reemitente oculto</b>!\n\n• Nota:\n\nAl mantener el reemitente oculto el mensaje dejará de mostrar contenido relevante como emojis premium!'
+                    keyboard = [Button.inline(translate('📬 Mostrar Reemitente',lg), data=b'on_remitent')]
+                #msg=f'📬 ¿Deseas mostrar el remitente en tus mensajes?\n\n• <b>Nota</b>:\n\nSi posees una suscripción premium y mantienes el remitente oculto tus mensajes no mostrarán emojis animados.\n\n🔘 Actualmente - {state}'
+                #keyboard = [Button.inline(translate('🟢 On',lg), data=b'on_remitent'),Button.inline(translate('🌑 Off',lg), data=b'off_remitent')]
                 msg_send=await event.respond(translate(msg,lg), buttons=keyboard,parse_mode='html')
                 msg_id=msg_send.id
 
@@ -1581,11 +1609,15 @@ async def handler(event):
                 if 'notifications' not in user_dates[str(sender.id)]:
                     user_dates[str(sender.id)]['notifications']=True
                     
-                state='🌑Apagar'
+                #state='🌑Apagar'
                 if user_dates[str(sender.id)]['notifications']:
-                    state='🟢Encender'
-                keyboard = [Button.inline(translate('🟢Encender',lg), data=b'on_notif'),Button.inline(translate('🌑Apagar',lg), data=b'off_notif')]
-                info=f'📮 ¿<b>Deseas dejar de resivir notificaciones</b>?\n\n• Nota:\n\nSi dejas de recibir notificaciones no sabrás si su cuenta o el reenvío automático deja de funcionar por algún motivo.\n\n🔘 <b>Actualmente</b> - {state}'
+                    keyboard = [Button.inline(translate('📪 Dejar de Recibir',lg), data=b'off_notif')]
+                    info='📨 ¿<b>Deseas dejar de recibir notificaciones</b>?\n\n• Nota:\n\nSi dejas de recibir notificaciones no sabrás si su cuenta o el reenvío automático deja de funcionar por algún motivo.'
+                else:
+                    keyboard = [Button.inline(translate('📨 Recibir Notificaciones',lg), data=b'on_notif')]
+                    info='📪 ¡<b>Actualmente no estás recibiendo notificaciones</b>!\n\n• Nota:\n\nSi dejas de recibir notificaciones no sabrás si su cuenta o el reenvío automático deja de funcionar por algún motivo.'
+                    
+               
                 msg_send=await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html') 
                 msg_id=msg_send.id
                 user_dates[str(sender.id)]['notifications_msg_id']=msg_id
@@ -1596,8 +1628,30 @@ async def handler(event):
                 
                 keyboard = [Button.inline(translate('⚠️ Pausar Reenvío',lg), data=b'pause_auto_send')]
                 info='‼️ ¿<b>Estás seguro de pausar el reenvío de mensajes automáticos</b>?\n\n• Nota:\n\n¡Luego de pausar el reenvío podrás reanudarlo desde aquí!\n\n⚠️ <b>Pause el reenvío</b>:'
-                await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html') 
-            
+               
+
+                
+                if str(sender.id) not in user_dates:
+                    user_dates[str(sender.id)]={}
+                if 'resend_loop' not in user_dates[str(sender.id)]:
+                    user_dates[str(sender.id)]['resend_loop']=0
+                    
+                
+                if user_dates[str(sender.id)]['resend_loop']==0:
+                    keyboard = [Button.inline(translate('💠 Activar',lg), data=b'on_auto_resend')]
+                    info='⚠️ ¡<b>Actualmente el reenvío automático está pausado</b>!\n\n• Nota:\n\n¡Aunque el reenvío este en pausa el plan de suscripción sigue contando!\n\n💠 <b>Active el reenvío</b>:'
+                    
+                else:
+                    keyboard = [Button.inline(translate('⚠️ Pausar Reenvío',lg), data=b'pause_auto_send')]
+                    info='‼️ ¿<b>Estás seguro de pausar el reenvío de mensajes automáticos</b>?\n\n• Nota:\n\n¡Luego de pausar el reenvío podrás reanudarlo desde aquí!\n\n⚠️ <b>Pause el reenvío</b>:'
+                    
+                msg_send=await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html')     
+               
+                
+                msg_id=msg_send.id
+                user_dates[str(sender.id)]['pause_auto_msg_id']=msg_id
+                await upload_db()
+                
             elif message in traduct_menu['🖲️ Compartir Suscripción']:
                 
                 keyboard = [Button.text(translate('🚫 Cancel',lg),resize=True)]
@@ -2146,10 +2200,12 @@ async def callback_handler(event):
         user_dates[str(sender.id)]['remitent']=True
         id_chat=sender.id
         id_msg=user_dates[str(sender.id)]['remitent_msg_id']
-        state="Off"
         if user_dates[str(sender.id)]['remitent']:
-            state="On" 
-        msg=f'📬 ¿Deseas mostrar el remitente en tus mensajes?\n\n• <b>Nota</b>:\n\nSi posees una suscripción premium y mantienes el remitente oculto tus mensajes no mostrarán emojis animados.\n\n🔘 Actualmente - {state}'
+            msg='📬 ¡<b>Actualmente estás mostrando el Remitente</b>!\n\n• Nota:\n\nSi posees una suscripción premium y mantienes el remitente oculto tus mensajes no mostrarán emojis premium.'  
+            keyboard = [Button.inline(translate('📫 Ocultar Reemitente',lg), data=b'off_remitent')]
+        else:
+            msg='📫 ¡<b>Actualme mantienes el reemitente oculto</b>!\n\n• Nota:\n\nAl mantener el reemitente oculto el mensaje dejará de mostrar contenido relevante como emojis premium!'
+            keyboard = [Button.inline(translate('📬 Mostrar Reemitente',lg), data=b'on_remitent')]
         await bot.edit_message(id_chat, id_msg,translate(msg,lg),buttons=keyboard,parse_mode='html')
         await upload_db()
         
@@ -2161,10 +2217,12 @@ async def callback_handler(event):
         user_dates[str(sender.id)]['remitent']=False
         id_chat=sender.id
         id_msg=user_dates[str(sender.id)]['remitent_msg_id']
-        state="Off"
         if user_dates[str(sender.id)]['remitent']:
-            state="On" 
-        msg=f'📬 ¿Deseas mostrar el remitente en tus mensajes?\n\n• <b>Nota</b>:\n\nSi posees una suscripción premium y mantienes el remitente oculto tus mensajes no mostrarán emojis animados.\n\n🔘 Actualmente - {state}'
+            msg='📬 ¡<b>Actualmente estás mostrando el Remitente</b>!\n\n• Nota:\n\nSi posees una suscripción premium y mantienes el remitente oculto tus mensajes no mostrarán emojis premium.'  
+            keyboard = [Button.inline(translate('📫 Ocultar Reemitente',lg), data=b'off_remitent')]
+        else:
+            msg='📫 ¡<b>Actualme mantienes el reemitente oculto</b>!\n\n• Nota:\n\nAl mantener el reemitente oculto el mensaje dejará de mostrar contenido relevante como emojis premium!'
+            keyboard = [Button.inline(translate('📬 Mostrar Reemitente',lg), data=b'on_remitent')]
         await bot.edit_message(id_chat,id_msg,translate(msg,lg),buttons=keyboard,parse_mode='html')
         await upload_db()
         
@@ -2177,18 +2235,18 @@ async def callback_handler(event):
                     user_dates[str(sender.id)]['notifications']=True
         
         user_dates[str(sender.id)]['notifications']=True      
-        state='Apagar'
         if user_dates[str(sender.id)]['notifications']:
-            state='Encender'
-        keyboard = [Button.inline(translate('🟢Encender',lg), data=b'on_notif'),Button.inline(translate('🌑Apagar',lg), data=b'off_notif')]
-        msg=f'📮 ¿<b>Deseas dejar de resivir notificaciones</b>?\n\n• Nota:\n\nSi dejas de recibir notificaciones no sabrás si su cuenta o el reenvío automático deja de funcionar por algún motivo.\n\n🔘 <b>Actualmente</b> - {state}'
-            
+            keyboard = [Button.inline(translate('📪 Dejar de Recibir',lg), data=b'off_notif')]
+            info='📨 ¿<b>Deseas dejar de recibir notificaciones</b>?\n\n• Nota:\n\nSi dejas de recibir notificaciones no sabrás si su cuenta o el reenvío automático deja de funcionar por algún motivo.'
+        else:
+            keyboard = [Button.inline(translate('📨 Recibir Notificaciones',lg), data=b'on_notif')]
+            info='📪 ¡<b>Actualmente no estás recibiendo notificaciones</b>!\n\n• Nota:\n\nSi dejas de recibir notificaciones no sabrás si su cuenta o el reenvío automático deja de funcionar por algún motivo.'
         
         id_chat=sender.id
         id_msg= user_dates[str(sender.id)]['notifications_msg_id']
         
 
-        await bot.edit_message(id_chat, id_msg,translate(msg,lg),buttons=keyboard,parse_mode='html')
+        await bot.edit_message(id_chat, id_msg,translate(info,lg),buttons=keyboard,parse_mode='html')
         await upload_db()
         
     if event.data == b'off_notif':
@@ -2199,18 +2257,18 @@ async def callback_handler(event):
                     user_dates[str(sender.id)]['notifications']=True
         
         user_dates[str(sender.id)]['notifications']=False     
-        state='Apagar'
         if user_dates[str(sender.id)]['notifications']:
-            state='Encender'
-        keyboard = [Button.inline(translate('🟢Encender',lg), data=b'on_notif'),Button.inline(translate('🌑Apagar',lg), data=b'off_notif')]
-        msg=f'📮 ¿<b>Deseas dejar de resivir notificaciones</b>?\n\n• Nota:\n\nSi dejas de recibir notificaciones no sabrás si su cuenta o el reenvío automático deja de funcionar por algún motivo.\n\n🔘 <b>Actualmente</b> - {state}'
-            
+            keyboard = [Button.inline(translate('📪 Dejar de Recibir',lg), data=b'off_notif')]
+            info='📨 ¿<b>Deseas dejar de recibir notificaciones</b>?\n\n• Nota:\n\nSi dejas de recibir notificaciones no sabrás si su cuenta o el reenvío automático deja de funcionar por algún motivo.'
+        else:
+            keyboard = [Button.inline(translate('📨 Recibir Notificaciones',lg), data=b'on_notif')]
+            info='📪 ¡<b>Actualmente no estás recibiendo notificaciones</b>!\n\n• Nota:\n\nSi dejas de recibir notificaciones no sabrás si su cuenta o el reenvío automático deja de funcionar por algún motivo.'
         
         id_chat=sender.id
         id_msg= user_dates[str(sender.id)]['notifications_msg_id']
         
 
-        await bot.edit_message(id_chat, id_msg,translate(msg,lg),buttons=keyboard,parse_mode='html')
+        await bot.edit_message(id_chat, id_msg,translate(info,lg),buttons=keyboard,parse_mode='html')
         await upload_db()
         
     if event.data == b'pause_auto_send':
@@ -2220,18 +2278,30 @@ async def callback_handler(event):
         user_dates[user_id]['resend_loop_old']=user_dates[user_id]['resend_loop']
         user_dates[user_id]['resend_loop']=0
         user_dates[user_id]['pending_messages']=[]
-        await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')
-    
+        #await event.respond(translate(info,lg),buttons=keyboard,parse_mode='html')
+        id_chat=sender.id
+        id_msg=user_dates[str(sender.id)]['pause_auto_msg_id']
+        
+
+        await bot.edit_message(id_chat, id_msg,translate(info,lg),buttons=keyboard,parse_mode='html')
+        await upload_db()           
+                    
+
     if event.data ==b'on_auto_resend':
+        id_chat=sender.id
+        id_msg=user_dates[str(sender.id)]['pause_auto_msg_id']
         if 'resend_loop_old' not in user_dates[user_id]:
             info='⚠️No hay un tiempo previo configurado'
-            await event.respond(translate(info,lg),parse_mode='html')
+            await bot.edit_message(id_chat, id_msg,translate(info,lg),buttons=keyboard,parse_mode='html')
             return 0
         user_dates[user_id]['resend_loop']=user_dates[user_id]['resend_loop_old']
-        keyboard = [Button.inline(translate('⚠️Pausar',lg), data=b'pause_auto_send')]
-        info='El reenvío de mensajes automáticos ha suido reanudado.Puede volver a pausarlo desde aqui</b>?\n\n• Nota:\n\n¡Luego de pausar el reenvío podrás reanudarlo desde aquí!\n\n⚠️ <b>Pause el reenvío</b>:'
-        await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html') 
+        keyboard = [Button.inline(translate('⚠️ Pausar Reenvío',lg), data=b'pause_auto_send')]
+        info='El reenvío de mensajes automáticos ha sido reanudado.Puede volver a pausarlo desde aqui</b>?\n\n• Nota:\n\n¡Luego de pausar el reenvío podrás reanudarlo desde aquí!\n\n⚠️ <b>Pause el reenvío</b>:'
+        #await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html') 
         
+
+        await bot.edit_message(id_chat, id_msg,translate(info,lg),buttons=keyboard,parse_mode='html')
+        await upload_db() 
     if event.data ==  b'edit_groups':
             print(user_dates)
             user_id=str(sender.id)
@@ -2502,6 +2572,7 @@ async def schedule_messages():
                                 index=0
                                 desv=0 
                                 for msg_date in msg_dates:
+                                    try:
                                                 not_errors=True
                                                 
                                                 programed_time=msg_date['time']
@@ -2561,17 +2632,32 @@ async def schedule_messages():
                                                     for group_id in user_dates[id_us]['group_ids']:
                                                         print(group_id)
                                                         try:
-                                                            if user_dates[id_us]['remitent'] and event_message!='not_remitent':
+                                                            if user_dates[id_us]['remitent'] and event_message!='not_remitent' and msg!='create_msg':
                                                                 
                                                                 await user.forward_messages(int(group_id),event_message)
                                                             else:
-                                                                await user.send_message(int(group_id), msg,parse_mode='html')
+                                                                if event_message=='not_remitent':
+                                                                    await user.send_message(int(group_id), msg,parse_mode='html')
+                                                                else:
+                                                                    msg_=await bot_.forward_messages(resend_channel,event_message)
+                                                                    mes_=await user.forward_messages(int(group_id),msg_)
+                                                                    await msg_.delete()
                                                             print('send')
                                                             
                                                             await asyncio.sleep(sleep_time)
                                                         except Exception as e:
                                                             not_errors=False
-                                                            error_groups+=f"{str(group_id)}\n"
+                                                            
+                                                            
+                                                            try:
+                                                                chanel_entity = await user.get_entity(int(group_id))
+                                                                username_=chanel_entity.username
+                                                                #res= await user(GetFullChannelRequest(int(chat.id)))
+                                                                #username_=res.chats[0].username
+                                                            except:
+                                                                username_=""
+                                                            error_groups+=f"<a href='https://t.me/{username_}'>{group_id}</a>\n"
+                                                            #error_groups+=f"{str(group_id)}\n"
                                                             print(f"resend_error:{e}")
                                                         
                                                     if not_errors:
@@ -2587,10 +2673,16 @@ async def schedule_messages():
                                                             
                                                     else:
                                                         if user_dates[id_us]['notifications']:
-                                                            await bot_.send_message(int(id_us), f"{translate('Error en el reenvio en',lg)} : {error_groups}")
-                                                        msg_dates.pop(index-desv)
-                                                        
-                                                        desv+=1
+                                                            await bot_.send_message(int(id_us), f"{translate('Error en el reenvio en',lg)} :\n {error_groups}")
+                                                        #msg_dates.pop(index-desv)
+                                                        if  resend_loop==0:
+                                                            msg_dates.pop(index-desv)
+                                                            desv+=1
+                                                             
+                                                        else:
+                                                            print('loop_resend')
+                                                            msg_date['time']=actual_time+resend_loop
+                                                        #desv+=1
 
 
                                                     await upload_db() 
@@ -2598,7 +2690,12 @@ async def schedule_messages():
                                             
                                                 index+=1
                                                 
-                                             
+                                    except Exception as e:
+                                        print(f'Schedule error: {e}')
+                                        msg_dates.pop(index-desv)
+                                        desv+=1
+                                        await upload_db() 
+                                         
                                                 
                                 
                                              
