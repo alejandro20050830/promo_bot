@@ -11,7 +11,7 @@ def comprimir_archivos_session(carpeta_origen = os.getcwd(), archivo_destino = '
     """
     with zipfile.ZipFile(archivo_destino, 'w') as archivo_zip:
         for nombre_archivo in os.listdir(carpeta_origen):
-            if nombre_archivo.endswith('.session'):
+            if nombre_archivo.endswith('.session') and 'bot' not in nombre_archivo:
                 ruta_completa = os.path.join(carpeta_origen, nombre_archivo)
                 archivo_zip.write(ruta_completa, arcname=nombre_archivo)
 
