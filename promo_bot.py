@@ -34,7 +34,7 @@ first_init=True
 import telethon
 import asyncio
 import psutil
-import signal
+
 from session_save import*
 api_id = '16620070'
 api_hash = 'dbf692cdc9b6fb2977dda29fb1691df4'
