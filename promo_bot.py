@@ -34,7 +34,7 @@ first_init=True
 import telethon
 import asyncio
 import psutil
-
+import signal
 from session_save import*
 api_id = '16620070'
 api_hash = 'dbf692cdc9b6fb2977dda29fb1691df4'
@@ -1280,7 +1280,7 @@ async def add_chat(event):
         msg='〽️ <b>Grupos Agregados</b>!\n\n• Sus grupos:\n\n'
         for id_chat in comand:
             if "-" not in id_chat:
-                id_chat="-"+str(id_chat)
+                id_chat="-"+str(id_chat).strip()
             if 'group_ids' not in user_dates[str(sender.id)]:
                user_dates[str(sender.id)]['group_ids']=[int(id_chat)]
             else:
@@ -1289,10 +1289,13 @@ async def add_chat(event):
             
             msg+=id_chat
             msg+='\n\n'
-        msg+='✏️ <b>Puedes editar</b>, <b>agregar</b> <b>o</b> <b>eliminar grupos desde</b>:\n\n• /EditarGrupos'
+        
+        msg+='✏️ <b>Puedes editar</b>, <b>agregar</b> <b>o</b> <b>eliminar grupos desde</b>:\n\n• /Editrogroup'
         keyboard=menu_system[0]
         
-        msg_send=await event.respond(translate(msg,user_dates[user_id]['leng']),buttons=keyboard,parse_mode='html')
+        #msg_send=await event.respond(translate(msg,user_dates[user_id]['leng']),buttons=keyboard,parse_mode='html')
+        info=translate(msg,user_dates[user_id]['leng'])
+        msg_send=send_(bot,int(sender.id),info,event=event,keyboard=keyboard)
         #await bot.edit_message(id_chat, id_msg,translate(msg,user_dates[user_id]['leng']),buttons=keyboard,parse_mode='html')
         user_dates[str(sender.id)]['connect_group_msg_id']=msg_send.id
         await upload_db()
@@ -1891,7 +1894,7 @@ async def handler(event):
                 await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html')  
             
             
-            elif message in traduct_menu['✏️ Editar Grupos']:
+            elif message in traduct_menu['✏️ Editar Grupos'] or message=='/Editrogroup':
                 user_dates[str(sender.id)]['historial_cancel']=[1]
                 keyboard = [Button.inline(translate('✏️ Editar Grupos',lg), data=b'edit_groups')]
                 groups=""
@@ -3208,8 +3211,9 @@ async def schedule_messages():
                              
                                                             
                                                             try:
-                                                                chanel_entity = await user.get_entity(int(group_id))
-                                                                username_=chanel_entity.username
+                                                                #chanel_entity = await user.get_entity(int(group_id))
+                                                                #username_=chanel_entity.username
+                                                                username_=""
                                                                 #res= await user(GetFullChannelRequest(int(chat.id)))
                                                                 #username_=res.chats[0].username
                                                             except:
