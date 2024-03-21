@@ -5,3 +5,4 @@ urllib3==1.26.12
 flask
 telethon
 deep-translator==1.11.4
+psutil
