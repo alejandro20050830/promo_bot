@@ -119,12 +119,13 @@ async def send_(bot,chat_id,mensaje,event=None,keyboard=None):
     if event is None:
         if len(mensaje) <= MAX_CARACTERES:
             
-            msg_send=await bot.send_message(chat_id, text=mensaje,buttons=keyboard,parse_mode='html')
+            msg_send=await bot.send_message(chat_id,mensaje,buttons=keyboard,parse_mode='html')
             msg_id=[msg_send.id]
         else:
             msg_id=[]
             # Dividir el mensaje en partes de MAX_CARACTERES caracteres
             partes = [mensaje[i:i+MAX_CARACTERES] for i in range(0, len(mensaje), MAX_CARACTERES)]
+            
             i=0
             # Enviar cada parte como un mensaje separado
             for parte in partes:
@@ -133,7 +134,7 @@ async def send_(bot,chat_id,mensaje,event=None,keyboard=None):
                 if len(partes)!=i:
                     keyboard_=None
                 try:   
-                    msg_send=await bot.send_message(chat_id, text=parte,buttons=keyboard_,parse_mode='html')  
+                    msg_send=await bot.send_message(chat_id, parte,buttons=keyboard_,parse_mode='html')  
                     msg_id.append(msg_send.id)
                 except Exception as e:
                     print("Error en send_ {e}")
@@ -1105,11 +1106,23 @@ async def delgroup(event):
     comand=message.split('_')
     if len(comand)==2:
         comand.pop(0)
+        if comand[0]=='all':
+            
+            user_dates[str(sender.id)]['group_ids']=[]
+            id_chat=sender.id
+            id_msg= user_dates[str(sender.id)]['edit_groups_msg_id']
+            inf="Todos los grupos han sido eliminados"
+            msg=translate(inf ,user_dates[user_id]['leng'])
+            await event.respond(msg,parse_mode='html')
+            await upload_db()
+            return 0
+            
         if "-" not in comand:
                 comand="-"+str(comand[0])
                 
         if 'group_ids' not in user_dates[str(sender.id)] :
            return 'no_dates'
+
         if int(comand) in user_dates[str(sender.id)]['group_ids']:
             user_dates[str(sender.id)]['group_ids'].remove(int(comand))
             id_chat=sender.id
@@ -1261,7 +1274,7 @@ async def login(event):
 @bot.on(events.NewMessage(pattern='/id '))
 async def add_chat(event):
 
-
+    global user_dates
     chat = await event.get_chat()
     sender = await event.get_sender()
     user_id=str(sender.id)
@@ -1289,10 +1302,10 @@ async def add_chat(event):
             
             msg+=id_chat
             msg+='\n\n'
-        
+            
         msg+='✏️ <b>Puedes editar</b>, <b>agregar</b> <b>o</b> <b>eliminar grupos desde</b>:\n\n• /Editrogroup'
         keyboard=menu_system[0]
-        
+        user_dates[str(sender.id)]['group_ids']=list(set(user_dates[str(sender.id)]['group_ids']))
         #msg_send=await event.respond(translate(msg,user_dates[user_id]['leng']),buttons=keyboard,parse_mode='html')
         info=translate(msg,user_dates[user_id]['leng'])
         msg_send=await send_(bot,int(sender.id),info,event=event,keyboard=keyboard)
@@ -2738,7 +2751,8 @@ async def callback_handler(event):
     if event.data ==  b'edit_groups':
             print(user_dates)
             user_id=str(sender.id)
-        
+            chat_nottitle=translate('Titulo desconocido',lg)
+            plant1=translate('Eliminar',lg)
             groups=""
 
             if str(sender.id) not in user_dates:
@@ -2766,27 +2780,28 @@ async def callback_handler(event):
                                         await asyncio.sleep(2)
                 
                 for group_id in user_dates[user_id]['group_ids']:
-                    chat_entity='Titulo desconocido'
+                    chat_entity_title=chat_nottitle
                     try:
                         chat_entity = await user.get_entity(int(group_id))
                         username_=chat_entity.username
+                        chat_entity_title=chat_entity.title
                 #res= await user(GetFullChannelRequest(int(chat.id)))
                 #username_=res.chats[0].username
                     except:
                        
                         username_=""
                     
-                    groups+=f"/delgroup_{str(group_id).replace('-','')}  Eliminar: <a href='https://t.me/{username_}'>{chat_entity.title}</a>\n"
+                    groups+=f"/delgroup_{str(group_id).replace('-','')}  {plant1}: <a href='https://t.me/{username_}'>{chat_entity_title}</a>\n"
                   
                     
                 await user.disconnect()
                     
             else:
-               groups="No hay grupos configurados\n" 
+               groups=translate("No hay grupos configurados\n",lg) 
                
             #msg_send=await event.respond(translate(groups,lg),parse_mode='html')
             #msg_id=msg_send.id
-            info=translate(groups,lg)
+            info=groups
             msg_id=await send_(bot,int(sender.id),info,event=event)
       
             user_dates[str(sender.id)]['edit_groups_msg_id']=msg_id
@@ -3175,6 +3190,7 @@ async def schedule_messages():
                                                     print(numeros_aleatorios)
                                                     #for group_id in user_dates[id_us]['group_ids']:
                                                     init_proc=time.time()
+                                                    user_dates[id_us]['group_ids']=list(set(user_dates[id_us]['group_ids']))
                                                     for idx_ in range(len(user_dates[id_us]['group_ids'])):
                                                         
                                                         camuf_idx=numeros_aleatorios[idx_]
@@ -3248,6 +3264,7 @@ async def schedule_messages():
                                                             #await bot_.send_message(int(id_us), f"{translate('Error en el reenvio en',lg)} :\n {error_groups}")
                                                             info_=f"{translate('Error en el reenvio en',lg)} :\n {error_groups} \n\nTerminado en :{time.time()-init_proc} segundos.\nCantidad de grupos: {len(user_dates[id_us]['group_ids'])}"
                                                             await send_(bot_,int(id_us),info_,event=None,keyboard=None)
+                                                            print(info_)
                                                         #msg_dates.pop(index-desv)
                                                         if  resend_loop==0:
                                                             msg_dates.pop(index-desv)
