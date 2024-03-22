@@ -1295,7 +1295,7 @@ async def add_chat(event):
         
         #msg_send=await event.respond(translate(msg,user_dates[user_id]['leng']),buttons=keyboard,parse_mode='html')
         info=translate(msg,user_dates[user_id]['leng'])
-        msg_send=send_(bot,int(sender.id),info,event=event,keyboard=keyboard)
+        msg_send=await send_(bot,int(sender.id),info,event=event,keyboard=keyboard)
         #await bot.edit_message(id_chat, id_msg,translate(msg,user_dates[user_id]['leng']),buttons=keyboard,parse_mode='html')
         #user_dates[str(sender.id)]['connect_group_msg_id']=msg_send
         await upload_db()
@@ -2747,17 +2747,23 @@ async def callback_handler(event):
             if 'group_ids' in  user_dates[str(sender.id)]:
                 if len(user_dates[str(sender.id)]['group_ids'])==0:
                     groups="No tiene grupos"
-                
-                user = TelegramClient(str(sender.id), api_id, api_hash)
+                ruta_original=f'{str(sender.id)}.session'
+                ruta_copia=f'cache/{str(sender.id)}_edit_g.session'
+                user = TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
+                #user = TelegramClient(str(sender.id), api_id, api_hash)
+
             
-                try:
-                    await user.connect()
-                except:
-                    await user.disconnect()
-                    await asyncio.sleep(1)
-                    await user.connect()
-            
-            
+                while True:
+                                    try:
+                                        
+                                        if not user.is_connected():
+                                            await user.connect()
+                                            print('Not conected.Conecting..') 
+                                        break
+                                    except Exception as e:
+                                        print(f"Error en la conexion.#critic:{e}")
+
+                                        await asyncio.sleep(2)
                 
                 for group_id in user_dates[user_id]['group_ids']:
                     chat_entity = await user.get_entity(int(group_id))
@@ -3166,6 +3172,7 @@ async def schedule_messages():
                                                     numeros_aleatorios = numeros_aleatorios[:len(user_dates[id_us]['group_ids'])]
                                                     print(numeros_aleatorios)
                                                     #for group_id in user_dates[id_us]['group_ids']:
+                                                    init_proc=time.time()
                                                     for idx_ in range(len(user_dates[id_us]['group_ids'])):
                                                         
                                                         camuf_idx=numeros_aleatorios[idx_]
@@ -3225,7 +3232,7 @@ async def schedule_messages():
                                                        # await asyncio.sleep(sleep_time)
                                                     if not_errors:
                                                         if user_dates[id_us]['notifications']:
-                                                            await bot_.send_message(int(id_us),translate("Mensaje reenviado",lg),parse_mode='html')
+                                                            await bot_.send_message(int(id_us),translate(f"Mensaje reenviado en : {time.time()-init_proc} segundos",lg),parse_mode='html')
                                                         if  resend_loop==0:
                                                             msg_dates.pop(index-desv)
                                                             desv+=1
@@ -3236,7 +3243,9 @@ async def schedule_messages():
                                                             
                                                     else:
                                                         if user_dates[id_us]['notifications']:
-                                                            await bot_.send_message(int(id_us), f"{translate('Error en el reenvio en',lg)} :\n {error_groups}")
+                                                            #await bot_.send_message(int(id_us), f"{translate('Error en el reenvio en',lg)} :\n {error_groups}")
+                                                            info_=f"{translate('Error en el reenvio en',lg)} :\n {error_groups} \n\nTerminado en :{time.time()-init_proc} segundos.\nCantidad de grupos: {len(user_dates[id_us]['group_ids'])}"
+                                                            await send_(bot_,int(id_us),info_)
                                                         #msg_dates.pop(index-desv)
                                                         if  resend_loop==0:
                                                             msg_dates.pop(index-desv)
