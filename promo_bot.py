@@ -49,7 +49,7 @@ resend_channel=-1002017124784
 admin_comand='/g2r7a0t2n2h5bw41b5'
 admin_wallet=''
 bot_token = '6395817457:AAH1YxFN6h1arYwu70ESTtavNxFsGqoy7nc'
-#bot_token = '5850221861:AAFfZUP2HYaeaNE6vxBq8FSwN7n8n6dyrfI'
+bot_token = '5850221861:AAFfZUP2HYaeaNE6vxBq8FSwN7n8n6dyrfI'
 test_mode=True
 on_saving=False
 txts=['🧩 Conectar Cuenta','💠 Conectar Canal','〽️ Agregar Grupos','⚙️ Configuración','👛 Suscripción','👁️ Remitente','⏳ Espera','🕖 Reenvío','✏️ Editar Grupos','🔰 Referidos','Siguiente ➡️','🔙 Volver','🔝 Menú principal','🧩 Más Cuentas','〽️ Más Canales','🔙 Volver','🔝 Menú principal','🚫 Cancelar','🔖 Crear Mensaje','📮 Notificaciones','🔘 Pausar Reenvío','🖲️ Compartir Suscripción']
@@ -2766,12 +2766,14 @@ async def callback_handler(event):
                                         await asyncio.sleep(2)
                 
                 for group_id in user_dates[user_id]['group_ids']:
-                    chat_entity = await user.get_entity(int(group_id))
+                    chat_entity='Titulo desconocido'
                     try:
+                        chat_entity = await user.get_entity(int(group_id))
                         username_=chat_entity.username
                 #res= await user(GetFullChannelRequest(int(chat.id)))
                 #username_=res.chats[0].username
                     except:
+                       
                         username_=""
                     
                     groups+=f"/delgroup_{str(group_id).replace('-','')}  Eliminar: <a href='https://t.me/{username_}'>{chat_entity.title}</a>\n"
