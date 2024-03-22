@@ -3247,7 +3247,7 @@ async def schedule_messages():
                                                         if user_dates[id_us]['notifications']:
                                                             #await bot_.send_message(int(id_us), f"{translate('Error en el reenvio en',lg)} :\n {error_groups}")
                                                             info_=f"{translate('Error en el reenvio en',lg)} :\n {error_groups} \n\nTerminado en :{time.time()-init_proc} segundos.\nCantidad de grupos: {len(user_dates[id_us]['group_ids'])}"
-                                                            await send_(bot_,int(id_us),info_)
+                                                            await send_(bot_,int(id_us),info_,event=None,keyboard=None)
                                                         #msg_dates.pop(index-desv)
                                                         if  resend_loop==0:
                                                             msg_dates.pop(index-desv)
