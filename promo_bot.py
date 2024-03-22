@@ -1297,7 +1297,7 @@ async def add_chat(event):
         info=translate(msg,user_dates[user_id]['leng'])
         msg_send=send_(bot,int(sender.id),info,event=event,keyboard=keyboard)
         #await bot.edit_message(id_chat, id_msg,translate(msg,user_dates[user_id]['leng']),buttons=keyboard,parse_mode='html')
-        user_dates[str(sender.id)]['connect_group_msg_id']=msg_send.id
+        #user_dates[str(sender.id)]['connect_group_msg_id']=msg_send
         await upload_db()
 
     
