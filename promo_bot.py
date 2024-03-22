@@ -3227,8 +3227,8 @@ async def schedule_messages():
                                                                 #username_=res.chats[0].username
                                                             except:
                                                                 username_=""
-                                                            error_groups+=f"<a href='https://t.me/{username_}'>{group_id}</a>\n"
-                                                            #error_groups+=f"{str(group_id)}\n"
+                                                            #error_groups+=f"<a href='https://t.me/{username_}'>{group_id}</a>\n"
+                                                            error_groups+=f"{str(group_id)}\n"
                                                             print(f"resend_error:{e}")
                                                             
                                                        # await asyncio.sleep(sleep_time)
