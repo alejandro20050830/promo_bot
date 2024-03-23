@@ -2151,7 +2151,7 @@ async def handler(event):
                 msg_id=msg_send.id
                 user_dates[str(sender.id)]['close_msg_id']=msg_id
                 await upload_db()
-
+                await upload_sessiondb()
             elif len(user_dates[user_id]['historial_'])>0:
                 print('added')
                 if  user_dates[user_id]['historial_'][0]=='🔖 Crear Mensaje':
