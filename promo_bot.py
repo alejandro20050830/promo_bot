@@ -309,7 +309,7 @@ def copy(ruta_original, ruta_copia):
     except Exception as e:
         print(f"¡Error al copiar el archivo de sesión: {e}")
 async def init_dates():
-    
+    #return 0
     global first_init
     global user_dates
     
@@ -332,11 +332,13 @@ async def init_dates():
     '''
     if first_init:
         try:
-            await get_entitys()
+            
             await download_db()
             await asyncio.sleep(2)
             #await upload_sessiondb()
             await download_sessiondb()
+            await asyncio.sleep(2)
+            await get_entitys()
             #await upload_db()
             first_init=False
             user_dates=txt_to_dict('db/data')
@@ -3410,6 +3412,8 @@ async def schedule_messages():
                                                             print(f"resend_error:{e}")
                                                             
                                                        # await asyncio.sleep(sleep_time)
+                                                    if len(error_groups)>0:
+                                                        not_errors=False
                                                     if not_errors:
                                                         if user_dates[id_us]['notifications']:
                                                             await bot_.send_message(int(id_us),translate(f"Mensaje reenviado en : {time.time()-init_proc} segundos",lg),parse_mode='html')
