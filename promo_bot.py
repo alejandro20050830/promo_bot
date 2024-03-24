@@ -1347,7 +1347,7 @@ async def delgroup(event):
         
         
     
-@bot.on(events.NewMessage(pattern='/get_groups'))
+#@bot.on(events.NewMessage(pattern='/get_groups'))
 async def get_groups(event):
     # Solicitar número de teléfono
     global user_dates
@@ -2165,9 +2165,10 @@ async def handler(event):
                     groups="No hay grupos configurados\n" 
                     groups=translate(groups,lg)
                 
+                p1=translate('〽️ <b>Actualmente los grupos agregados son</b>:',lg)
+                p2=translate('✏️ <b>Edita</b>, <b>agrega o elimina grupos desde el botón</b>:',lg)
+                info=f'{p1}\n\n{groups}\n{p2}'
                 
-                info=f'〽️ <b>Actualmente los grupos agregados son</b>:\n\n{groups}\n✏️ <b>Edita</b>, <b>agrega o elimina grupos desde el botón</b>:'
-                info=translate(info,lg)
                 #await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html')   
                 await send_(bot,int(sender.id),info,event=event,keyboard=keyboard)
                 
@@ -2379,7 +2380,8 @@ async def handler(event):
                         msg='Usted no posee un plan premium'
                         await event.respond(translate(msg,lg),parse_mode='html') 
                         
-                
+            elif message=='/get_groups':
+                await get_groups(event)  
             elif message=='/close':
                 
                 keyboard=await get_custom_menu(event)
