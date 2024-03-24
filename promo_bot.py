@@ -1351,31 +1351,16 @@ async def delgroup(event):
 async def get_groups(event):
     # Solicitar número de teléfono
     global user_dates
-    global accounts_conected
+    
     
     sender = await event.get_sender()
     ruta_original=f'{str(sender.id)}.session'
     ruta_copia=f'cache/{str(sender.id)}_gg.session'
-    
+    user = TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
     user_id=str(sender.id)
-    id_us=user_id
-    try:
-            if str(id_us) in  accounts_conected:
-                user=accounts_conected[str(id_us)]
-                print(f'{str(id_us)} ya se encuentra conectada')
-            else: 
-                                          
-                user = TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
-                                        
-                accounts_conected[str(id_us)]= user
-                accounts_conected[f'{str(id_us)}_lote']=time.time()+random.randint(300, 1000)
-                print(f'{str(id_us)} NO se encuentra conectada')
-    except Exception as e:
-            print("Error in resesnd _connect")
-            user = TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
-            
+
     if not user.is_user_authorized:
-        chat_id=int(id_us)
+        chat_id=int(user_id)
         mensaje="Su cuenta se ha desconectado por favor vuelva a conectarla"
         await bot.send_message(chat_id,mensaje,parse_mode='html')
         return 0
