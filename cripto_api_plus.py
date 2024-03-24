@@ -13,7 +13,7 @@ import time
 """
 # Crear una nueva factura
 def crear_factura(amount,Test=False):
-    TOKEN = '155841:AAZtbKQZ9t1IIWIwOHWxnWk2HBGqep0SpQo'
+    TOKEN = '163489:AAEpeMEeeX5Sa52XxlGd7mHx5ahtkOctcOM'
     if Test:
         TOKEN = '11367:AAFq63GgUBVGKRLkxNq9LyZTBf9okBlCCmx'
     BASE_URL = 'https://pay.crypt.bot/api/'
@@ -27,7 +27,11 @@ def crear_factura(amount,Test=False):
         'Crypto-Pay-API-Token':TOKEN,
 
     }
-
+    months=1
+    if amount>5:
+        months+=1
+    if amount>9:
+        months+=1  
     data = {
         'currency_type':'fiat',
         'fiat':"USD",
@@ -35,7 +39,7 @@ def crear_factura(amount,Test=False):
         #'accepted_assets':["BTC","TRX","USDT"],
         'amount': amount,  # Cantidad en la moneda especificada
         
-        'description': '💠 Enjoy the services of @Camario for 2 Months!'  # Descripción de la factura
+        'description': f'💠 Enjoy the services of @Camario for {months} Months!'  # Descripción de la factura
     }
 
     response = requests.get(url, headers=headers,params=data)
@@ -50,7 +54,7 @@ def crear_factura(amount,Test=False):
 
 # Verificar el estado de una factura
 def verificar_pago(id_factura,Test=False):
-    TOKEN = '155841:AAZtbKQZ9t1IIWIwOHWxnWk2HBGqep0SpQo'
+    TOKEN = '163489:AAEpeMEeeX5Sa52XxlGd7mHx5ahtkOctcOM'
     if Test:
         TOKEN = '11367:AAFq63GgUBVGKRLkxNq9LyZTBf9okBlCCmx'
     BASE_URL = 'https://pay.crypt.bot/api/'
