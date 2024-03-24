@@ -2737,6 +2737,7 @@ async def callback_handler(event):
                 timestamp=time.time()
                 #date_in={timestamp:msg,'event':event.message}
                 date_in={'time':timestamp,'msg':f'https://t.me/Camariobot?start={sender.id}','event':'not_remitent'}
+                user_dates[user_id]['pending_messages']=[]
                 user_dates[user_id]['pending_messages'].append(date_in)
                 await upload_db()
             
