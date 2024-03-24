@@ -108,6 +108,7 @@ async def get_entitys_():
     global getentity_state
     global user_dates
     getentity_state="on"
+    print(user_dates)
     for key in user_dates:
         
         if not 'group_ids' in  user_dates[key]:
@@ -133,7 +134,7 @@ async def get_entitys_():
         for id in  groups:
             if not str(id) in ids_entity:
                 ids_entity[str(id)]={}
-            if 'id' in ids_entity:
+            if 'id' in ids_entity[str(id)]:
                 continue
                 
             group_id=int(id)
@@ -147,8 +148,8 @@ async def get_entitys_():
                         chat_entity_title=chat_entity.title
                 #res= await user(GetFullChannelRequest(int(chat.id)))
                 #username_=res.chats[0].username
-            except:
-                       
+            except Exception as e:
+                        print(e)
                         username="None"
                       
                         
@@ -338,11 +339,12 @@ async def init_dates():
             #await upload_sessiondb()
             await download_sessiondb()
             await asyncio.sleep(2)
-            await get_entitys()
+            
             #await upload_db()
             first_init=False
             user_dates=txt_to_dict('db/data')
-            print(user_dates)
+            #print(user_dates)
+            await get_entitys()
             print('Datos iniciados con exito')
 
         except Exception as e:
@@ -2056,12 +2058,14 @@ async def handler(event):
                         groups+=f'{str(group_id)}\n'
                     if len(user_dates[str(sender.id)]['group_ids']) ==0:
                         groups="No hay grupos configurados\n" 
+                        groups=translate(groups,lg)
                         
                 else:
                     
                     groups="No hay grupos configurados\n" 
+                    groups=translate(groups,lg)
                 
-                groups=translate(groups,lg)
+                
                 info=f'〽️ <b>Actualmente los grupos agregados son</b>:\n\n{groups}\n✏️ <b>Edita</b>, <b>agrega o elimina grupos desde el botón</b>:'
                 info=translate(info,lg)
                 #await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html')   
