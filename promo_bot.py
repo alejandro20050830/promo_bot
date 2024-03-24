@@ -309,7 +309,7 @@ def copy(ruta_original, ruta_copia):
     except Exception as e:
         print(f"¡Error al copiar el archivo de sesión: {e}")
 async def init_dates():
-    return 0
+    
     global first_init
     global user_dates
     
@@ -456,7 +456,7 @@ async def download_sessiondb():
     task = asyncio.create_task(download_sessiondb_())
     await task
 async def download_db_():
-    return 0
+    #return 0
     global on_saving
     if not on_saving:
         on_saving=True
@@ -490,7 +490,7 @@ async def download_db_():
         on_saving=False 
    
 async def upload_db_():
-    return 0
+    #return 0
     
     global on_saving
     if not on_saving:
