@@ -1953,6 +1953,7 @@ async def send_anounce(event):
 async def handler(event):
     global first_init
     global admins
+    global accounts_conected
     sender = await event.get_sender()
     user_id=str(sender.id)
     await init_dates()
@@ -2007,19 +2008,36 @@ async def handler(event):
                 
             if message in traduct_menu['🧩 Conectar Cuenta'] or message=='/ConnectAccount':
                 user_dates[str(sender.id)]['historial_cancel']=[0]
-                user = TelegramClient(str(sender.id), api_id, api_hash)
+                
+                id_us=str(sender.id)
+                try:
+                        if str(id_us) in  accounts_conected:
+                            user=accounts_conected[str(id_us)]
+                            print(f'{str(id_us)} ya se encuentra conectada')
+                        else: 
+                                                    
+                            user = TelegramClient(str(sender.id), api_id, api_hash)
+                                                    
+                            accounts_conected[str(id_us)]= user
+                            accounts_conected[f'{str(id_us)}_lote']=time.time()+random.randint(300, 1000)
+                            print(f'{str(id_us)} NO se encuentra conectada')
+                except Exception as e:
+                        print("Error in resesnd _connect")
+                        user = TelegramClient(str(sender.id), api_id, api_hash)
+                '''
                 try:
                     await user.connect()
                 except:
                     await user.disconnect()
                     await asyncio.sleep(1)
                     await user.connect()
+                ''' 
                 if sender.id not in menu_history:
                     menu_history[sender.id]=[message]
                 else:
                     menu_history[sender.id].append(message)
                     
-                    
+                
                 if await user.is_user_authorized():
                     keyboard = [Button.inline(translate('🧩 Conectar Cuenta',lg), data=b'connect')]
                     
@@ -2035,7 +2053,7 @@ async def handler(event):
                     msg_id=msg_send.id
                     user_dates[str(sender.id)]['connect_msg_id']=msg_id
                     
-                await user.disconnect()
+                #await user.disconnect()
         
 
             elif message in traduct_menu['🚫 Cancelar']:
