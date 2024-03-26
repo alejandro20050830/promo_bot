@@ -225,16 +225,16 @@ async def init_sessions():
                     continue
                 ruta_original=f'{str(id_us)}.session'
                 ruta_copia=f'cache/{str(id_us)}_resend.session'
-                user = TelegramClient(archivo, api_id, api_hash)
+                userx = TelegramClient(archivo, api_id, api_hash)
                 
                 user_= TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
-                ruta_copia=f'cache/{str(id_us)}_normal.session'
-                userx= TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
+                ruta_copia=f'cache/{str(id_us)}_initses.session'
+                user= TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
                 
                 try:
                                         
-                                        if not user.is_connected():
-                                            await user.connect()
+                                        if not userx.is_connected():
+                                            await userx.connect()
                                             print('Not conected.Conecting..') 
                                         
                 except Exception as e:
@@ -242,11 +242,11 @@ async def init_sessions():
                                         
                                         continue
                                       
-                if user.is_user_authorized:
+                if userx.is_user_authorized:
                     print('')
                     accounts_conected[f'{str(id)}_sch']=user_
                     
-                    accounts_conected[str(id)]=userx
+                    accounts_conected[str(id)]=user
                 else:
                     chat_id=int(id)
                     mensaje="Su cuenta se ha desconectado por favor vuelva a conectarla"
@@ -258,7 +258,7 @@ async def init_sessions():
                         # Eliminar el archivo
                         os.remove(ruta_archivo)
                         print(f"El archivo {ruta_archivo} ha sido eliminado.")
-            
+                await userx.disconnect()
             except Exception as e:
                     print(f'Error en init_sessions en {archivo}: {e}')
     except Exception as e:
@@ -695,13 +695,7 @@ async def login_(event,password="not_set"):
             user_dates[user_id]['leng']='spanish'
             
     lg=user_dates[user_id]['leng']
-    ruta_archivo = f'{user_id}.session'
 
-                    # Verificar si el archivo existe antes de intentar eliminarlo
-    if os.path.exists(ruta_archivo):
-                        # Eliminar el archivo
-                        os.remove(ruta_archivo)
-                        print(f"El archivo {ruta_archivo} ha sido eliminado.")
     user = TelegramClient(str(sender.id), api_id, api_hash)
     try:
         await user.connect()
@@ -1247,6 +1241,13 @@ async def send_code(event):
     
     sender = await event.get_sender()
     user_id=str(sender.id)
+    ruta_archivo = f'{user_id}.session'
+
+                    # Verificar si el archivo existe antes de intentar eliminarlo
+    if os.path.exists(ruta_archivo):
+                        # Eliminar el archivo
+                        os.remove(ruta_archivo)
+                        print(f"El archivo {ruta_archivo} ha sido eliminado.")
     user = TelegramClient(str(sender.id), api_id, api_hash)
     
     try:
@@ -2068,6 +2069,19 @@ async def handler(event):
                 user_dates[str(sender.id)]['historial_cancel']=[0]
                 
                 id_us=str(sender.id)
+                ruta_archivo = f'{id_us}.session'
+
+                    # Verificar si el archivo existe antes de intentar eliminarlo
+                if not os.path.exists(ruta_archivo):
+                        # Eliminar el archivo
+                    keyboard = [Button.inline(translate('🧩 Conectar Cuenta',lg), data=b'connect')]
+                    info='🧩 <b>Menú de Conectividad</b>:\n\n• Utilice esto para forjar una conexión entre su cuenta y @CamarioBot.\n\n• Una conexión con al menos una cuenta es esencial para utilizar los servicios.\n\n• Ingrese el número de teléfono asociado a la cuenta de Telegram, incluya el prefijo de país, elimine el espacio entre el prefijo y el número.\n\n💡 <b>Parámetros de Conexión</b>:\n\n<code>/connect</code> (Número de teléfono completo sin espacios)\n\n• <b>Ejemplo</b>: su número es <b>+84 55555</b>, debes enviar\n\n/connect +8455555\n\n🌐 <b>Descubre el prefijo de cada país visitando este </b><b><a href="https://countrycode.org/">Enlace</a></b>\n\n• No estás seguro de cómo proceder, contacte con <a href="http://t.me/CamarioAdmin">Soporte</a>.\n\n🧩 <b>Conecte su Cuenta</b>:'
+                    msg_send=await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html',link_preview=False)
+                    msg_id=msg_send.id
+                    
+                    user_dates[str(sender.id)]['connect_msg_id']=msg_id
+                    return 0
+                    
                 try:
                         if str(id_us) in  accounts_conected:
                             user=accounts_conected[str(id_us)]
@@ -3197,6 +3211,7 @@ async def callback_handler(event):
                 keyboard=await get_custom_menu(event)
                 keyboard=keyboard[0]
                 if os.path.exists(file):
+                    
                     os.remove(file)
                     print("El archivo ha sido eliminado.")
                
@@ -3214,6 +3229,12 @@ async def callback_handler(event):
                     keyboard = [Button.inline(translate('🧩 Conectar Cuenta',lg), data=b'connect')]
                     await bot.edit_message(id_chat, id_msg,translate(msg,lg),buttons=keyboard,parse_mode='html')
                     user_dates[str(sender.id)]['connect_msg_id']=id_msg
+                    if f'{str(user_id)}_sch' in accounts_conected:
+                        
+                        accounts_conected.pop(f'{str(user_id)}_sch')
+                    if user_id in accounts_conected:
+                        
+                        accounts_conected.pop(user_id)
                     await upload_db()
                 else:
                     print("El archivo no existe.")
