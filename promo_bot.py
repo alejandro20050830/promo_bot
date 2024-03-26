@@ -747,7 +747,7 @@ async def login_(event,password="not_set"):
     keyboard = await get_custom_menu(event)
     keyboard=keyboard[0]
     await upload_sessiondb()
-    accounts_conected[str(sender.id)]= user
+    #accounts_conected[str(sender.id)]= user
     info="🐾 ¡Conexión Establecida con Éxito!\n\n🤜🤛 Gracias por elegir @Camariobot, ahora todos nuestros servicios están disponibles para usted!\n\n👣 Para comenzar a configurar su primera tarea de reenvío siga los siguientes pasos:\n \n#Paso1 - Debes agregar un canal el cual se utilizará para reenviar todas la publiciones a todos sus grupos agregados.\n\n• <b>/AddChannel</b><b>\n\n</b>#Paso2 - Es tan simple que solamente te falta agregar las ID de los grupos a los cuales se reenviarán los mensajes recibidos en el canal previamente configurado.\n\n• <b>/AddGroups</b><b>\n\n</b>⚙️ Para cualquier consulta, no dude en contactar con @CamarioAdmin\n\n🦎 Manténgase Informado con las últimas actualizaciones @Camario"
     await event.respond(translate(info,lg), buttons=keyboard,parse_mode='html')
     #await bot.edit_message(id_chat, id_msg,translate(info,lg),buttons=keyboard,parse_mode='html')
