@@ -226,8 +226,11 @@ async def init_sessions():
                 ruta_original=f'{str(id_us)}.session'
                 ruta_copia=f'cache/{str(id_us)}_resend.session'
                 user = TelegramClient(archivo, api_id, api_hash)
+                
                 user_= TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
-                '''
+                ruta_copia=f'cache/{str(id_us)}_normal.session'
+                userx= TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
+                
                 try:
                                         
                                         if not user.is_connected():
@@ -236,13 +239,14 @@ async def init_sessions():
                                         
                 except Exception as e:
                                         print(f"Error en la conexion.#critic:{e}")
+                                        
                                         continue
-                '''                       
+                                      
                 if user.is_user_authorized:
                     print('')
                     accounts_conected[f'{str(id)}_sch']=user_
                     
-                    accounts_conected[str(id)]=user
+                    accounts_conected[str(id)]=userx
                 else:
                     chat_id=int(id)
                     mensaje="Su cuenta se ha desconectado por favor vuelva a conectarla"
@@ -691,7 +695,13 @@ async def login_(event,password="not_set"):
             user_dates[user_id]['leng']='spanish'
             
     lg=user_dates[user_id]['leng']
-    
+    ruta_archivo = f'{user_id}.session'
+
+                    # Verificar si el archivo existe antes de intentar eliminarlo
+    if os.path.exists(ruta_archivo):
+                        # Eliminar el archivo
+                        os.remove(ruta_archivo)
+                        print(f"El archivo {ruta_archivo} ha sido eliminado.")
     user = TelegramClient(str(sender.id), api_id, api_hash)
     try:
         await user.connect()
