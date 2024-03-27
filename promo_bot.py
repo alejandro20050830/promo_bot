@@ -164,7 +164,7 @@ async def get_entitys_():
                                             print('Not conected.Conecting..') 
                                         break
                     except Exception as e:
-                                        print(f"Error en la conexion.#critic:{e}")
+                                        print(f"Error en la conexion.#critic in get_entitys:{e}")
 
                                         await asyncio.sleep(2)
         
@@ -1583,10 +1583,11 @@ async def add_chat(event):
         user_dates[str(sender.id)]['group_ids']=list(set(user_dates[str(sender.id)]['group_ids']))
         #msg_send=await event.respond(translate(msg,user_dates[user_id]['leng']),buttons=keyboard,parse_mode='html')
         info=translate(msg,user_dates[user_id]['leng'])
+        await get_entitys()
         msg_send=await send_(bot,int(sender.id),info,event=event,keyboard=keyboard)
         #await bot.edit_message(id_chat, id_msg,translate(msg,user_dates[user_id]['leng']),buttons=keyboard,parse_mode='html')
         #user_dates[str(sender.id)]['connect_group_msg_id']=msg_send
-        await get_entitys()
+        
         await upload_db()
 
     
