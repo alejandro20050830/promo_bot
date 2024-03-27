@@ -1590,9 +1590,10 @@ async def add_channel(event):
     user_id=str(sender.id)
     global user_dates
     #user = TelegramClient(str(sender.id), api_id, api_hash)
+
+    id_us=str(sender.id)
     ruta_original=f'{str(id_us)}.session'
     ruta_copia=f'cache/{str(id_us)}_initses.session'
-    id_us=str(sender.id)
     try:
                         if str(id_us) in  accounts_conected:
                             user=accounts_conected[str(id_us)]
@@ -2538,6 +2539,7 @@ async def menu_action(action,event):
 async def callback_handler(event):
     global user_dates
     global admins
+    global accounts_conected
     chat_id = event.chat_id
     sender = await event.get_sender()
     user_id=str(sender.id)   
