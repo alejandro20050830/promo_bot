@@ -1590,6 +1590,8 @@ async def add_channel(event):
     user_id=str(sender.id)
     global user_dates
     #user = TelegramClient(str(sender.id), api_id, api_hash)
+    ruta_original=f'{str(id_us)}.session'
+    ruta_copia=f'cache/{str(id_us)}_initses.session'
     id_us=str(sender.id)
     try:
                         if str(id_us) in  accounts_conected:
@@ -1597,14 +1599,14 @@ async def add_channel(event):
                             print(f'{str(id_us)} ya se encuentra conectada')
                         else: 
                                                     
-                            user = TelegramClient(str(sender.id), api_id, api_hash)
+                            user= TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
                                                     
                             accounts_conected[str(id_us)]= user
                             accounts_conected[f'{str(id_us)}_lote']=time.time()+random.randint(300, 1000)
                             print(f'{str(id_us)} NO se encuentra conectada')
     except Exception as e:
                         print("Error in resesnd _connect")
-                        user = TelegramClient(str(sender.id), api_id, api_hash)
+                        user= TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
     while True:
                                     try:
                                         
@@ -2014,7 +2016,7 @@ async def handler(event):
     global accounts_conected
     sender = await event.get_sender()
     user_id=str(sender.id)
-    await  init_dates()
+    #await  init_dates()
     message = event.raw_text
     if "-" not in str(sender.id) and "/start" not in message :
         
@@ -3431,7 +3433,7 @@ async def schedule_messages():
 
                                 #user = TelegramClient(str(id_us), api_id, api_hash)
                                 ruta_original=f'{str(id_us)}.session'
-                                ruta_copia=f'cache/{str(id_us)}_resend.session'
+                                ruta_copia=f'cache/{str(id_us)}_resend1.session'
                                 try:
                                     if f'{str(id_us)}_sch' in  accounts_conected:
                                         user= accounts_conected[f'{str(id_us)}_sch']
