@@ -103,6 +103,7 @@ async def enviar_mensajes_concurrentes(chat_ids, mensaje, error_chats,client,eve
     await asyncio.gather(*tasks)
 
 async def get_entitys_():
+    global first_init
     print('getting')
     global ids_entity
     global getentity_state
@@ -137,16 +138,19 @@ async def get_entitys_():
                 user = TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
                 
         '''
+        key_acc=str(id_us)
+        if first_init:
+            key_acc=f'{str(id_us)}_sch'
         try:
-                                    if f'{str(id_us)}_sch' in  accounts_conected:
-                                        user= accounts_conected[f'{str(id_us)}_sch']
+                                    if key_acc in  accounts_conected:
+                                        user= accounts_conected[key_acc]
                                         print(f'{str(id_us)} ya se encuentra conectada')
                                     else: 
                                           
                                         user = TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
                                         
-                                        accounts_conected[f'{str(id_us)}_sch']=user
-                                        accounts_conected[f'{str(id_us)}_schlote']=time.time()+random.randint(300, 1000)
+                                        accounts_conected[key_acc]=user
+                                        accounts_conected[f'{str(id_us)}_lote']=time.time()+random.randint(300, 1000)
                                         print(f'{str(id_us)} NO se encuentra conectada')
         except Exception as e:
                                     print("Error in get_entitys _connect")
@@ -194,7 +198,10 @@ async def get_entitys_():
             ids_entity[str(id)]['id']=group_id
             ids_entity[str(id)]['username']=username
             ids_entity[str(id)]['tittle']= chat_entity_title
+            
+    
     getentity_state="off"  
+    await user.disconnect()
 async def get_entitys():
     global getentity_state
     if getentity_state=="off":
@@ -203,7 +210,7 @@ async def get_entitys():
         await task
                         
 async def init_sessions():
-    
+    #return 0
     # Obtener la ruta del directorio actual
     try:
         directorio_actual = os.getcwd()
@@ -446,17 +453,17 @@ async def init_dates():
             await  init_sessions()
             await asyncio.sleep(2)
             #await upload_db()
-            first_init=False
+            
             user_dates=txt_to_dict('db/data')
             #print(user_dates)
             await get_entitys()
             print('Datos iniciados con exito')
-
+            first_init=False
         except Exception as e:
             print(e)
             
 async def download_sessiondb_():
-    
+    #return 0
     global on_saving
     if not on_saving:
         on_saving=True
@@ -559,8 +566,11 @@ async def upload_sessiondb_():
         on_saving=False  
    
 async def upload_sessiondb():
-    task = asyncio.create_task(upload_sessiondb_())
-    await task
+    #return 0
+    global first_init
+    if not first_init:
+        task = asyncio.create_task(upload_sessiondb_())
+        await task
 async def download_sessiondb():
     task = asyncio.create_task(download_sessiondb_())
     await task
@@ -664,8 +674,10 @@ async def upload_db_():
         on_saving=False
     
 async def upload_db():
-    task = asyncio.create_task(upload_db_())
-    await task
+    global first_init
+    if not first_init:
+        task = asyncio.create_task(upload_db_())
+        await task
 async def download_db():
     task = asyncio.create_task(download_db_())
     await task
@@ -2017,7 +2029,7 @@ async def handler(event):
     global accounts_conected
     sender = await event.get_sender()
     user_id=str(sender.id)
-    #await  init_dates()
+    await  init_dates()
     message = event.raw_text
     if "-" not in str(sender.id) and "/start" not in message :
         
@@ -3360,6 +3372,7 @@ async def callback_handler(event):
  
  
 async def schedule_messages():
+    try:
         global accounts_conected
         bot_ =await TelegramClient('bot_', api_id, api_hash).start(bot_token=bot_token)
         while True:
@@ -3435,7 +3448,7 @@ async def schedule_messages():
 
                                 #user = TelegramClient(str(id_us), api_id, api_hash)
                                 ruta_original=f'{str(id_us)}.session'
-                                ruta_copia=f'cache/{str(id_us)}_resend1.session'
+                                ruta_copia=f'cache/{str(id_us)}_resend.session'
                                 try:
                                     if f'{str(id_us)}_sch' in  accounts_conected:
                                         user= accounts_conected[f'{str(id_us)}_sch']
@@ -3565,7 +3578,8 @@ async def schedule_messages():
                                                         try:
                                                             
                                                             if user_dates[id_us]['remitent'] and event_message!='not_remitent' and msg!='create_msg':
-                                                                
+                                                                print('forwading')
+                                                                #await user.forward_messages(-431421912,event_message)
                                                                 await enviar_mensajes_concurrentes(chunk, "None", error_groups,user,event_message)
                                                             else:
                                                                 if event_message=='not_remitent':
@@ -3701,7 +3715,8 @@ async def schedule_messages():
                 except:
                     print('desconectado')  
         #threading.Thread(target=main).start()
-        
+    except Exception as e:
+        print(e)    
 
         
     
