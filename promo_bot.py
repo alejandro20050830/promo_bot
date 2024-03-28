@@ -3824,9 +3824,10 @@ async def mainx():
         
     except Exception as e:
         #loop.close()
-        loop.create_task(init_dates())
-        loop.create_task(schedule_messages())
-        print(f"mainx exception :{e}")
+        loop.create_task(mainx())
+        #loop.create_task(init_dates())
+        #loop.create_task(schedule_messages())
+        #print(f"mainx exception :{e}")
 
 
 def main():
