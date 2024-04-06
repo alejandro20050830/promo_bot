@@ -1,4 +1,5 @@
 import os
+import copy
 from telethon import TelegramClient, events
 from telethon.tl import functions, types
 from telethon import events, Button
@@ -99,9 +100,13 @@ async def enviar_mensaje(chat_id, mensaje, error_chats,client,event_message):
         print(f'Error al enviar mensaje a {chat_id}: {e}')
     
 async def enviar_mensajes_concurrentes(chat_ids, mensaje, error_chats,client,event_messag):
-    tasks = [enviar_mensaje(chat_id, mensaje, error_chats,client,event_messag) for chat_id in chat_ids]
-    await asyncio.gather(*tasks)
-
+    try:
+        tasks = [enviar_mensaje(chat_id, mensaje, error_chats,client,event_messag) for chat_id in chat_ids]
+        await asyncio.gather(*tasks)
+    except Exception as e:
+        
+        
+        print(f'Error al enviar mensajes concurrentes a {chat_ids}: {e}')
 async def get_entitys_():
     global first_init
     print('getting')
@@ -3345,6 +3350,7 @@ async def callback_handler(event):
                         
                         accounts_conected.pop(user_id)
                     await upload_db()
+                    await upload_sessiondb()
                 else:
                     print("El archivo no existe.")
                     msg='No posee cuenta conectada' 
@@ -3541,16 +3547,16 @@ async def schedule_messages():
 
                                 #user = TelegramClient(str(id_us), api_id, api_hash)
                                 ruta_original=f'{str(id_us)}.session'
-                                ruta_copia=f'cache/{str(id_us)}_.session'
+                                ruta_copia=f'cache/{str(id_us)}_sched.session'
                                 try:
-                                    if str(id_us) in  accounts_conected:
-                                        user= accounts_conected[str(id_us)]
+                                    if f'{str(id_us)}_sched' in  accounts_conected:
+                                        user= accounts_conected[f'{str(id_us)}_sched']
                                         print(f'{str(id_us)} ya se encuentra conectada')
                                     else: 
                                           
                                         user = TelegramClient(copy(ruta_original,ruta_copia), api_id, api_hash)
                                         
-                                        accounts_conected[str(id_us)]=user
+                                        accounts_conected[f'{str(id_us)}_sched']=user
                                         accounts_conected[f'{str(id_us)}_schlote']=time.time()+random.randint(300, 1000)
                                         print(f'{str(id_us)} NO se encuentra conectada')
                                 except Exception as e:
@@ -3802,15 +3808,17 @@ async def schedule_messages():
                 print(f'error{e}')
                 print(state)
                 #print(user_dates[id_us]['pending_messages'])
+                '''
                 try:
                     await asyncio.sleep(1)
                     await user.disconnect()
                 except:
                     print('desconectado')  
+                '''
         #threading.Thread(target=main).start()
     except Exception as e:
         print(e)    
-
+        await schedule_messages()
         
     
 
@@ -3835,7 +3843,7 @@ def main():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
-        #loop.run_until_complete(init_dates())
+        loop.run_until_complete(init_dates())
         loop.run_until_complete(schedule_messages())
         #asyncio.create_task(init_dates())
         #asyncio.create_task(schedule_messages())
@@ -3843,7 +3851,7 @@ def main():
     except Exception as e:
         #loop.close()
         print(f"main exception :{e}")
-        threading.Thread(target=main).start()
+        main()
         
 def main_():
     
@@ -3867,14 +3875,14 @@ def main_():
 
     
 # Crea un nuevo bucle de eventos
-#threading.Thread(target=main).start()
+threading.Thread(target=main).start()
 threading.Thread(target=main_).start()
 
 with bot:
     loop = bot.loop
     #loop.create_task(init_dates())
     #loop.create_task(schedule_messages())
-    loop.create_task(mainx())
+    #loop.create_task(mainx())
     bot.run_until_disconnected()
 # Iniciar el bot
 
