@@ -3839,7 +3839,7 @@ async def mainx():
 
 
 def main():
-    
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
@@ -3875,12 +3875,13 @@ def main_():
 
     
 # Crea un nuevo bucle de eventos
-threading.Thread(target=main).start()
+
 threading.Thread(target=main_).start()
 
 with bot:
     loop = bot.loop
     loop.create_task(init_dates())
+    threading.Thread(target=main).start()
     #loop.create_task(schedule_messages())
     #loop.create_task(mainx())
     bot.run_until_disconnected()
