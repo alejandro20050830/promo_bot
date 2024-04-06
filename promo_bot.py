@@ -3786,7 +3786,7 @@ async def schedule_messages():
                                                         #desv+=1
 
 
-                                                    await upload_db() 
+                                                    #await upload_db_() 
                                             
                                             
                                                 index+=1
@@ -3795,7 +3795,7 @@ async def schedule_messages():
                                         print(f'Schedule error: {e}')
                                         msg_dates.pop(index-desv)
                                         desv+=1
-                                        await upload_db() 
+                                        #await upload_db_() 
                                          
                                                 
                                 
