@@ -3826,7 +3826,7 @@ async def mainx():
     global bot 
     loop = bot.loop
     try:
-        await init_dates()
+        #await init_dates()
         await schedule_messages()
 
         
@@ -3880,7 +3880,7 @@ threading.Thread(target=main_).start()
 
 with bot:
     loop = bot.loop
-    #loop.create_task(init_dates())
+    loop.create_task(init_dates())
     #loop.create_task(schedule_messages())
     #loop.create_task(mainx())
     bot.run_until_disconnected()
