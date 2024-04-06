@@ -3843,7 +3843,7 @@ def main():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
-        loop.run_until_complete(init_dates())
+        #loop.run_until_complete(init_dates())
         loop.run_until_complete(schedule_messages())
         #asyncio.create_task(init_dates())
         #asyncio.create_task(schedule_messages())
